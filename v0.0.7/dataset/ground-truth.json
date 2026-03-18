@@ -1,0 +1,182 @@
+[
+  {
+    "id": "so-node-enospc-inotify",
+    "error": "Grunt watch error - Waiting...Fatal error: watch ENOSPC",
+    "context": "File watcher crashes on Linux. Disk has plenty of space. Using grunt watch or nodemon.",
+    "must_contain": ["inotify|max_user_watches|524288|sysctl"],
+    "must_not_suggest": ["free disk|delete files|rm -rf"],
+    "source": "https://stackoverflow.com/questions/22475849",
+    "covered": true
+  },
+  {
+    "id": "so-docker-exec-format-shebang",
+    "error": "standard_init_linux.go:178: exec user process caused exec format error",
+    "context": "Docker container fails to start. Dockerfile uses a shell script as entrypoint.",
+    "must_contain": ["shebang|#!/bin/bash|#!/bin/sh|first line|script header"],
+    "must_not_suggest": ["platform|arm|amd64"],
+    "source": "https://stackoverflow.com/questions/51508150",
+    "covered": true
+  },
+  {
+    "id": "so-docker-exec-format-platform",
+    "error": "Docker : exec /usr/bin/sh: exec format error",
+    "context": "Image built on M1/M2 Mac fails on x86 Linux server.",
+    "must_contain": ["platform|arm64|amd64|buildx|DOCKER_DEFAULT_PLATFORM|architecture"],
+    "must_not_suggest": ["shebang"],
+    "source": "https://stackoverflow.com/questions/73285601",
+    "covered": true
+  },
+  {
+    "id": "so-python-ssl-verify-failed",
+    "error": "urllib and SSL: CERTIFICATE_VERIFY_FAILED Error",
+    "context": "Python HTTPS request fails with SSL certificate verify error.",
+    "must_contain": ["SSLContext|ssl._create_unverified_context|certifi|Install Certificates|/Applications/Python"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/27835619",
+    "covered": true
+  },
+  {
+    "id": "so-docker-compose-localhost-wrong",
+    "error": "Using Docker: SQLSTATE[HY000] [2002] No such file or directory",
+    "context": "PHP app in Docker Compose can't connect to MySQL. Using localhost as db host.",
+    "must_contain": ["service name|container name|links|db|not.*localhost"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/44077094",
+    "covered": true
+  },
+  {
+    "id": "so-git-permission-denied-publickey",
+    "error": "How to solve Permission denied (publickey) error when using Git?",
+    "context": "git push/pull fails with Permission denied (publickey) on GitHub.",
+    "must_contain": ["ssh-keygen|id_rsa|ssh key|ssh-add|~/.ssh"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/2643502",
+    "covered": true
+  },
+  {
+    "id": "so-node-err-require-esm",
+    "error": "Error [ERR_REQUIRE_ESM]: require() of ES Module not supported",
+    "context": "Updated node-fetch to v3. CommonJS project breaks on require.",
+    "must_contain": ["import|ESM|ES Module|node-fetch@2|dynamic import|import\\("],
+    "must_not_suggest": ["type.*module.*package.json"],
+    "source": "https://stackoverflow.com/questions/69081410",
+    "covered": true
+  },
+  {
+    "id": "so-node-openssl-unsupported",
+    "error": "error:0308010C:digital envelope routines::unsupported",
+    "context": "npm run build fails after upgrading to Node 17/18. Using webpack or react-scripts.",
+    "must_contain": ["openssl-legacy-provider|NODE_OPTIONS|upgrade.*webpack|OpenSSL 3"],
+    "must_not_suggest": ["downgrade node"],
+    "source": "https://stackoverflow.com/questions/69692842",
+    "covered": true
+  },
+  {
+    "id": "so-express-cors-preflight-headers",
+    "error": "Request header field Access-Control-Allow-Headers is not allowed by itself in preflight response",
+    "context": "Custom headers in AJAX request trigger CORS preflight that fails.",
+    "must_contain": ["OPTIONS|preflight|Access-Control-Allow-Headers|Access-Control-Request-Headers"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/25727306",
+    "covered": true
+  },
+  {
+    "id": "so-docker-bind-address-in-use",
+    "error": "Docker Error bind: address already in use",
+    "context": "docker run or docker-compose up fails because port is taken.",
+    "must_contain": ["netstat|lsof|docker ps|kill|stop|port.*mapping|docker rm"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/46176584",
+    "covered": true
+  },
+  {
+    "id": "so-java-classcastexception-casting",
+    "error": "Explicit casting from super-class to sub-class throws ClassCastException",
+    "context": "Casting Animal to Dog throws ClassCastException at runtime in Java.",
+    "must_contain": ["instanceof|ClassCastException|actual type|runtime|downcast"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/4862960",
+    "covered": false
+  },
+  {
+    "id": "so-java-jackson-infinite-recursion",
+    "error": "Infinite Recursion with Jackson JSON and Hibernate JPA issue",
+    "context": "Jackson serialization of JPA entity with bidirectional relationship causes StackOverflow.",
+    "must_contain": ["@JsonIgnore|@JsonManagedReference|@JsonBackReference|JsonIgnore|bidirectional"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/3325387",
+    "covered": false
+  },
+  {
+    "id": "so-c-segmentation-fault",
+    "error": "What is a segmentation fault?",
+    "context": "C program crashes with Segmentation fault (core dumped).",
+    "must_contain": ["NULL|null pointer|memory.*belong|access.*memory|dereference|invalid.*memory|buffer overflow"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/2346806",
+    "covered": false
+  },
+  {
+    "id": "so-cpp-undefined-reference",
+    "error": "What is an undefined reference/unresolved external symbol error and how do I fix it?",
+    "context": "C++ linker error: undefined reference to function. Compiles but doesn't link.",
+    "must_contain": ["linker|link|object file|implementation|definition|.cpp|compile.*separately|library"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/12573816",
+    "covered": false
+  },
+  {
+    "id": "so-rust-self-referential-struct",
+    "error": "Why can't I store a value and a reference to that value in the same struct?",
+    "context": "Rust: struct holds a String and a &str pointing into it. Compiler rejects it.",
+    "must_contain": ["self-referential|Pin|owning_ref|rental|lifetime|borrow|move|invalidate"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/32300132",
+    "covered": false
+  },
+  {
+    "id": "so-rust-move-field-out-of-drop",
+    "error": "How to move one field out of a struct that implements Drop trait?",
+    "context": "Rust: trying to move a field out of a struct but compiler says it implements Drop.",
+    "must_contain": ["mem::replace|std::mem|swap|ManuallyDrop|take|Option"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/31561926",
+    "covered": false
+  },
+  {
+    "id": "so-go-test-panics",
+    "error": "How to test panics in Go?",
+    "context": "Go: need to write a test that expects a function to panic.",
+    "must_contain": ["recover|defer|t.Errorf|t.Fatal|assert.*panic|ShouldPanic"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/31595791",
+    "covered": false
+  },
+  {
+    "id": "so-k8s-oomkilled-reasons",
+    "error": "Reasons for OOMKilled in Kubernetes",
+    "context": "Kubernetes pod gets OOMKilled. Need to understand why and how to fix.",
+    "must_contain": ["memory limit|resources.*limits|describe pod|MemoryPressure|container.*limit|node.*memory"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/68164731",
+    "covered": true
+  },
+  {
+    "id": "so-docker-host-internal-linux",
+    "error": "What is the Linux equivalent of host.docker.internal?",
+    "context": "Docker container on Linux needs to reach host machine. host.docker.internal doesn't work.",
+    "must_contain": ["host-gateway|--add-host|host.docker.internal|172\\.|extra_hosts|network_mode.*host"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/48546124",
+    "covered": false
+  },
+  {
+    "id": "so-python-pygraphviz-libcgraph",
+    "error": "pip install pygraphviz: No package 'libcgraph' found",
+    "context": "pip install pygraphviz fails. Needs system library not available via pip.",
+    "must_contain": ["apt-get install|graphviz|libgraphviz-dev|pkg-config|system.*package|brew install"],
+    "must_not_suggest": ["pip install graphviz"],
+    "source": "https://stackoverflow.com/questions/15661384",
+    "covered": false
+  }
+]

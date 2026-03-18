@@ -1,0 +1,281 @@
+[
+  {
+    "title": "Grunt watch error - Waiting...Fatal error: watch ENOSPC",
+    "tag": "node.js",
+    "question_id": 16748737,
+    "views": 140328,
+    "answers": 7,
+    "link": "https://stackoverflow.com/questions/16748737/grunt-watch-error-waiting-fatal-error-watch-enospc",
+    "answer_text": "After doing some research found the solution. Run the below command. \n\n `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p\n` \n\n For Arch Linux add this line to /etc/sysctl.d/99-sysctl.conf: \n\n `fs.inotify.max_user_watches=524288\n`"
+  },
+  {
+    "title": "Node.js: what is ENOSPC error and how to solve?",
+    "tag": "node.js",
+    "question_id": 22475849,
+    "views": 371320,
+    "answers": 20,
+    "link": "https://stackoverflow.com/questions/22475849/node-js-what-is-enospc-error-and-how-to-solve",
+    "answer_text": "ENOSPC means that there is no space on the drive. \n Run the below command to avoid ENOSPC: \n `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p\n` \n \n For Arch Linux add this line to `/etc/sysctl.d/99-sysctl.conf`: \n `fs.inotify.max_user_watches=524288\n` \n Then execute: \n `sysctl --system\n` \n This will also persist across reboots.\n Technical Details Source"
+  },
+  {
+    "title": "standard_init_linux.go:178: exec user process caused \"exec format error\"",
+    "tag": "docker",
+    "question_id": 42494853,
+    "views": 422341,
+    "answers": 21,
+    "link": "https://stackoverflow.com/questions/42494853/standard-init-linux-go178-exec-user-process-caused-exec-format-error",
+    "answer_text": "I forgot to put  \n\n `#!/bin/bash\n` \n\n at the top of the sh file, problem solved."
+  },
+  {
+    "title": "Docker : exec /usr/bin/sh: exec format error",
+    "tag": "docker",
+    "question_id": 73285601,
+    "views": 400180,
+    "answers": 14,
+    "link": "https://stackoverflow.com/questions/73285601/docker-exec-usr-bin-sh-exec-format-error",
+    "answer_text": "The problem is that you built this image for arm64/v8 -- but your runner is using a different architecture. \n If you run: \n `docker image inspect rethkevin/rf:v1\n` \n You will see this in the output: \n `...\n        \"Architecture\": \"arm64\",\n        \"Variant\": \"v8\",\n        \"Os\": \"linux\",\n...\n` \n Try building and pushing your image from your GitLab CI runner so the architecture of the image will match your runner's architecture. \n Alternatively, you can  build for multiple architectures  using `docker buildx` . Alternatively still, you could also run a GitLab runner on ARM architecture so that it can run the image for the architecture you built it on. \n \n With modern versions of docker, you may also explicitly control the platform docker uses. Docker will use platform emulation if the specified platform is different from your native platform. \n For example: \n Using the `DOCKER_DEFAULT_PLATFORM` environment variable: \n `DOCKER_DEFAULT_PLATFORM=\"linux/amd64\" docker build -t test .\n` \n Using the `--platform` argument, either in the CLI or in your dockerfile: \n `docker build --platform=\"linux/amd64\" -t test .\n` \n `FROM --platform=linux/amd64 ubuntu:jammy\n` \n Systems with docker desktop installed should already be able to do this. If your system is using docker without docker desktop, you may need to install the docker-buildx plugins explicitly."
+  },
+  {
+    "title": "urllib and \"SSL: CERTIFICATE_VERIFY_FAILED\" Error",
+    "tag": "python",
+    "question_id": 27835619,
+    "views": 1379837,
+    "answers": 50,
+    "link": "https://stackoverflow.com/questions/27835619/urllib-and-ssl-certificate-verify-failed-error",
+    "answer_text": "If you  just  want to bypass verification, you can create a new  SSLContext . By default newly created contexts use  CERT_NONE . \n\n Be careful with this as stated in section  17.3.7.2.1  \n\n \n   When calling the SSLContext constructor directly, CERT_NONE is the default. Since it does not authenticate the other peer, it can be insecure, especially in client mode where most of time you would like to ensure the authenticity of the server you’re talking to. Therefore, when in client mode, it is highly recommended to use CERT_REQUIRED.  \n \n\n But if you just want it to work now for some other reason you can do the following, you'll have to `import ssl` as well: \n\n `input = input.replace(\"!web \", \"\")      \nurl = \"https://domainsearch.p.mashape.com/index.php?name=\" + input\nreq = urllib2.Request(url, headers={ 'X-Mashape-Key': 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' })\ngcontext = ssl.SSLContext()  # Only for gangstars\ninfo = urllib2.urlopen(req, context=gcontext).read()\nMessage.Chat.SendMessage (\"\" + info)\n` \n\n This should get round your problem but you're not really solving any of the issues, but you won't see the `[SSL: CERTIFICATE_VERIFY_FAILED]` because you now aren't verifying the cert! \n\n To add to the above, if you want to know more about why you are seeing these issues you will want to have a look at  PEP 476 . \n\n \n   This PEP proposes to enable verification of X509 certificate signatures, as well as hostname verification for Python's HTTP clients by default, subject to opt-out on a per-call basis. This change would be applied to Python 2.7, Python 3.4, and Python 3.5.  \n \n\n There is an advised opt out which isn't dissimilar to my advice above: \n\n `import ssl\n\n# This restores the same behavior as before.\ncontext = ssl._create_unverified_context()\nurllib.urlopen(\"https://no-valid-cert\", context=context)\n` \n\n It also features a  highly discouraged  option via  monkeypatching  which you don't often see in python: \n\n `import ssl\n\nssl._create_default_https_context = ssl._create_unverified_context\n` \n\n Which overrides the default function for context creation with the function to create an unverified context. \n\n Please note with this as stated in the PEP: \n\n \n   This guidance is aimed primarily at system administrators that wish to adopt newer versions of Python that implement this PEP in legacy environments that do not yet support certificate verification on HTTPS connections. For example, an administrator may opt out by adding the monkeypatch above to sitecustomize.py in their Standard Operating Environment for Python.  Applications and libraries SHOULD NOT be making this change process wide  (except perhaps in response to a system administrator controlled configuration setting).  \n \n\n If you want to read a paper on why not validating certs is bad in software  you can find it here !"
+  },
+  {
+    "title": "Scraping: SSL: CERTIFICATE_VERIFY_FAILED error for http://en.wikipedia.org",
+    "tag": "python",
+    "question_id": 50236117,
+    "views": 598828,
+    "answers": 27,
+    "link": "https://stackoverflow.com/questions/50236117/scraping-ssl-certificate-verify-failed-error-for-http-en-wikipedia-org",
+    "answer_text": "Once upon a time I stumbled  with this issue. If you're using macOS go to Macintosh HD > Applications > Python3.6 folder (or whatever version of python you're using) > double click on \"Install Certificates.command\" file. :D"
+  },
+  {
+    "title": "Changing a postgres containers server port in Docker Compose",
+    "tag": "docker-compose",
+    "question_id": 37775702,
+    "views": 174142,
+    "answers": 3,
+    "link": "https://stackoverflow.com/questions/37775702/changing-a-postgres-containers-server-port-in-docker-compose",
+    "answer_text": "Assuming postgres is running on port 5432 in the container and you want to expose it on the host on 5433, this ports strophe: \n `ports:\n    - \"5433:5432\"\n` \n will expose the server on port 5433 on the host. You can get rid of your existing expose strophe in this scenario. \n If you only want to expose the service to other services declared in the compose file (and NOT localhost), just use the expose strophe and point it to the already internally exposed port 5432."
+  },
+  {
+    "title": "Using Docker I get the error: \"SQLSTATE[HY000] [2002] No such file or directory\"",
+    "tag": "docker-compose",
+    "question_id": 40075065,
+    "views": 92850,
+    "answers": 5,
+    "link": "https://stackoverflow.com/questions/40075065/using-docker-i-get-the-error-sqlstatehy000-2002-no-such-file-or-directory",
+    "answer_text": "As someone pointed out in the comments, the docker-compose file you provided is very relevant to your question. \n\n The documentation for  `links`  in docker-compose files says \n\n \n   Containers for the linked service will be reachable at a hostname identical to the alias, or the service name if no alias was specified. \n \n\n In your case, the database container is named `db`, so resolving `db` host from the PHP container should point you at the MySQL container.  Replacing `localhost` with `db` in your config file should allow the PHP container to connect to MySQL."
+  },
+  {
+    "title": "How to solve Permission denied (publickey) error when using Git?",
+    "tag": "git",
+    "question_id": 2643502,
+    "views": 2482924,
+    "answers": 72,
+    "link": "https://stackoverflow.com/questions/2643502/how-to-solve-permission-denied-publickey-error-when-using-git",
+    "answer_text": "If the user has not generated a ssh public/private key pair set before  \n This info is working on theChaw but can be applied to all other git repositories which support SSH pubkey authentications. (See [gitolite][1], gitlab or github for example.) \n \n First start by setting up your own public/private key pair set. This\ncan use either DSA or RSA, so basically any key you setup will work.\nOn most systems you can use ssh-keygen. \n \n \n \n First you'll want to cd into your .ssh directory. Open up the terminal and run: \n \n \n `cd ~/.ssh && ssh-keygen` \n \n \n Next you need to copy this to your clipboard. \n On OS X run: `cat id_rsa.pub | pbcopy` \n On Linux run: `cat id_rsa.pub | xclip` \n On Windows (via Cygwin/Git Bash) run: `cat id_rsa.pub | clip` \n On Windows (Powershell) run: `Get-Content id_rsa.pub | Set-Clipboard` (Thx to @orion elenzil) \n Add your key to your account via the website. \n Finally setup your .gitconfig. \n `git config --global user.name \"bob\"` \n `git config --global user.email bob@...`\n(don't forget to restart your command line to make sure the config is reloaded) \n \n That's it you should be good to clone and checkout. \n \n Further information can be found at  https://help.github.com/articles/generating-ssh-keys  (thanks to @Lee Whitney)\n[1]:  https://github.com/sitaramc/gitolite  \n - \n  If the user has generated a ssh public/private key pair set before  \n \n check which key have been authorized on your github or gitlab account settings \n determine which corresponding private key must be associated from your local computer \n \n `eval $(ssh-agent -s)` \n \n define where the keys are located \n \n `ssh-add ~/.ssh/id_rsa`"
+  },
+  {
+    "title": "GitHub Error Message - Permission denied (publickey)",
+    "tag": "git",
+    "question_id": 12940626,
+    "views": 2036772,
+    "answers": 58,
+    "link": "https://stackoverflow.com/questions/12940626/github-error-message-permission-denied-publickey",
+    "answer_text": "GitHub isn't able to authenticate you.  So, either you aren't setup with an SSH key, because you haven't  set one up on your machine , or your key isn't associated with your GitHub account. \n You can also use the HTTPS URL instead of the SSH/git URL to avoid having to deal with SSH keys.  This is  GitHub's recommended method . \n Further, GitHub has a  help page specifically for that error message , and explains in more detail everything you could check. \n To solve it: \n \n  You should have a public key in your home directory, thus print the content of your public key, in Linux distro run for example `cat ~/.ssh/id_rsa.pub` (if the prior doesn't work, check the keys inside `~/.ssh/` with `.pub` extension) \n \n  Add the content of such a public key to your Github account: click your profile photo -> `Settings`-> `SSH and GPG keys` -> `New SSH key or Add SSH key`"
+  },
+  {
+    "title": "Error [ERR_REQUIRE_ESM]: require() of ES Module not supported",
+    "tag": "node.js",
+    "question_id": 69081410,
+    "views": 826864,
+    "answers": 3,
+    "link": "https://stackoverflow.com/questions/69081410/error-err-require-esm-require-of-es-module-not-supported",
+    "answer_text": "`node-fetch` v3 recently stopped support for the `require` way of importing it in favor of ES Modules. You'll need to use ESM imports now, like: \n `import fetch from \"node-fetch\";\n` \n at the top of your file."
+  },
+  {
+    "title": "Instead change the require of index.js, to a dynamic import() which is available in all CommonJS modules",
+    "tag": "node.js",
+    "question_id": 70541068,
+    "views": 339098,
+    "answers": 12,
+    "link": "https://stackoverflow.com/questions/70541068/instead-change-the-require-of-index-js-to-a-dynamic-import-which-is-available",
+    "answer_text": "It is because of the `node-fetch` package. As recent versions of this package only supports ESM; you have to downgrade it to an older version `node-fetch@2.6.1` or lower. \n `npm i node-fetch@2.6.1` \n This should solve the issue."
+  },
+  {
+    "title": "Error message \"error:0308010C:digital envelope routines::unsupported\"",
+    "tag": "node.js",
+    "question_id": 69692842,
+    "views": 3518533,
+    "answers": 71,
+    "link": "https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported",
+    "answer_text": "The error comes from your dependency relying on an obsolete version of SSL, so you have two good, and two questionable-at-best options: \n  1. Try to just reinstall your dependency  \n \n Delete your node_modules folder and rerun `npm install`. If your dependency relies on compiling against whatever version of Node you have installed, this may immediately fix the problem. This is the least likely solution to work, but  may  fix the problem without any \"real\" work on your part so is always worth trying. \n \n  2. Update your dependency  \n \n Almost all dependencies with this problem have a newer version available that you can install instead. Find out which version of your dependency corresponds to after Node 18 became the LTS version of Node, band uplift your dependency to that version. \n \n This is, really, the only proper solution: update your dependencies, because just like Node.js itself, they can leave your project vulnerable to attacks and exploits. \n  3. Downgrade to Node.js v16.  \n \n You can downgrade Node itself so that you're using a version that uses the old, insecure, version of LibSSL. That doesn't \"solve\" the problem of running insecure and potentially exploitable code, of course, but your code will at least run. \n \n (You can either do that using the  official Node installers , or you can use something like  `nvm` . For Windows, use  `nvm-windows` .) \n This is, obviously, a bad idea. As is the next one: \n  4. Tell Node to use the legacy OpenSSL provider  \n On Unix-like (Linux, macOS, Git bash, etc.): \n `export NODE_OPTIONS=--openssl-legacy-provider\n` \n On Windows command prompt: \n `set NODE_OPTIONS=--openssl-legacy-provider\n` \n On PowerShell: \n `$env:NODE_OPTIONS = \"--openssl-legacy-provider\"\n` \n When Node 18 had just become the active LTS options 1 and 2 weren't really available, but for anyone still finding this answer, 3 and 4 should no longer be considered serious options in any way."
+  },
+  {
+    "title": "pip install pygraphviz: No package 'libcgraph' found",
+    "tag": "python",
+    "question_id": 40528048,
+    "views": 33022,
+    "answers": 6,
+    "link": "https://stackoverflow.com/questions/40528048/pip-install-pygraphviz-no-package-libcgraph-found",
+    "answer_text": "`sudo apt-get install python-dev graphviz libgraphviz-dev pkg-config\n` \n\n or the following might be needed if you're using Python 3: \n\n `sudo apt-get install python3-dev graphviz libgraphviz-dev pkg-config\n` \n\n then \n\n `pip install pygraphviz\n`"
+  },
+  {
+    "title": "Request header field Access-Control-Allow-Headers is not allowed by itself in preflight response",
+    "tag": "express",
+    "question_id": 32500073,
+    "views": 1152962,
+    "answers": 27,
+    "link": "https://stackoverflow.com/questions/32500073/request-header-field-access-control-allow-headers-is-not-allowed-by-itself-in-pr",
+    "answer_text": "When you start playing around with custom request headers you will get a CORS preflight. This is a request that uses the HTTP `OPTIONS` verb and includes several headers, one of which being `Access-Control-Request-Headers` listing the headers the client wants to include in the request. \n\n You need to reply to that CORS preflight with the appropriate CORS headers to make this work. One of which is indeed `Access-Control-Allow-Headers`. That header needs to contain the same values the `Access-Control-Request-Headers` header contained (or more). \n\n  https://fetch.spec.whatwg.org/#http-cors-protocol  explains this setup in more detail."
+  },
+  {
+    "title": "Allow CORS REST request to a Express/Node.js application on Heroku",
+    "tag": "express",
+    "question_id": 11001817,
+    "views": 88694,
+    "answers": 6,
+    "link": "https://stackoverflow.com/questions/11001817/allow-cors-rest-request-to-a-express-node-js-application-on-heroku",
+    "answer_text": "I've cheked your code on a clean ExpressJS app and it works just fine. \n\n Try move your `app.use(allowCrossDomain)` to the top of configure function."
+  },
+  {
+    "title": "Reasons for OOMKilled in kubernetes",
+    "tag": "kubernetes",
+    "question_id": 62518884,
+    "views": 50843,
+    "answers": 5,
+    "link": "https://stackoverflow.com/questions/62518884/reasons-for-oomkilled-in-kubernetes",
+    "answer_text": "Both problems result in different error states: \n 1: An exceeded pod memory limit causes a `OOMKilled` termination \n 2: Node out of memory causes a `MemoryPressure` and pod eviction. \n `kubectl describe pod mypod-xxxx\n\n...\nReason:         Evicted\nMessage:        Pod The node had condition: [MemoryPressure].\n...\n`"
+  },
+  {
+    "title": "stackdriver-metadata-agent-cluster-level gets OOMKilled",
+    "tag": "kubernetes",
+    "question_id": 60541105,
+    "views": 5786,
+    "answers": 2,
+    "link": "https://stackoverflow.com/questions/60541105/stackdriver-metadata-agent-cluster-level-gets-oomkilled",
+    "answer_text": "The issue is being caused because the LIMIT set on the `metadata-agent` deployment is too low on resources so the POD is being killed (OOM killed) since the POD requires more memory to properly work. \n\n There is a workaround for this issue until it is fixed. \n\n \n\n You can overwrite the base resources in the configmap of the `metadata-agent` with: \n\n `kubectl edit cm -n kube-system metadata-agent-config` \n\n Setting `baseMemory: 50Mi` should be enough, if it doesn't work use higher value `100Mi` or `200Mi`. \n\n So `metadata-agent-config` configmap should look something like this: \n\n `apiVersion: v1\ndata:\n  NannyConfiguration: |-\n    apiVersion: nannyconfig/v1alpha1\n    kind: NannyConfiguration\n    baseMemory: 50Mi\nkind: ConfigMap\n` \n\n Note also that You need to restart the deployment, as the config map doesn't get picked up automatically: \n\n `kubectl delete deployment -n kube-system stackdriver-metadata-agent-cluster-level` \n\n For more details look into addon-resizer  Documentation ."
+  },
+  {
+    "title": "Docker Error bind: address already in use",
+    "tag": "docker",
+    "question_id": 37971961,
+    "views": 1085721,
+    "answers": 43,
+    "link": "https://stackoverflow.com/questions/37971961/docker-error-bind-address-already-in-use",
+    "answer_text": "In your case it was some other process that was using the port and as indicated in the comments, `sudo netstat -pna | grep 3000` helped you in solving the problem. \n While in other cases (I myself encountered it many times) it mostly is the same container running at some other instance. In that case `docker ps` was very helpful as often I left the same containers running in other directories and then tried running again at other places, where same container names were used. \n  How `docker ps` helped me:  \n \n `docker rm -f $(docker ps -aq)` is a short command which I use to remove all containers. \n \n  Edit:  Added how `docker ps` helped me."
+  },
+  {
+    "title": "What is the Linux equivalent of \"host.docker.internal\"?",
+    "tag": "docker",
+    "question_id": 48546124,
+    "views": 653830,
+    "answers": 11,
+    "link": "https://stackoverflow.com/questions/48546124/what-is-the-linux-equivalent-of-host-docker-internal",
+    "answer_text": "For Linux systems, you can – starting from major version `20.04` of the Docker engine – now also communicate with the host via `host.docker.internal`. This won't work  automatically , but you need to provide the following run flag: \n `--add-host=host.docker.internal:<host-gateway>\n` \n Replace `<host-gateway>` with the IP of the gateway, like `172.xxx.0.1`, where xxx is the offset of the network. \n See the answer here:  How to access host port from docker container  \n See also this answer below to add to a docker-compose file -  What is the Linux equivalent of \"host.docker.internal\"?"
+  },
+  {
+    "title": "Create the perfect JPA entity",
+    "tag": "java",
+    "question_id": 6033905,
+    "views": 187946,
+    "answers": 4,
+    "link": "https://stackoverflow.com/questions/6033905/create-the-perfect-jpa-entity",
+    "answer_text": "I'll try to answer several key points:  this is from long Hibernate/ persistence experience including several major applications. \n\n  Entity Class: implement Serializable?  \n\n  Keys  needs to implement Serializable. Stuff that's going to go in the HttpSession, or be sent over the wire by RPC/Java EE, needs to implement Serializable. Other stuff: not so much. Spend your time on what's important. \n\n  Constructors: create a constructor with all required fields of the entity?  \n\n Constructor(s) for application logic, should have only a few critical \"foreign key\" or \"type/kind\" fields which will always be known when creating the entity. The rest should be set by calling the setter methods -- that's what they're for. \n\n Avoid putting too many fields into constructors. Constructors should be convenient, and give basic sanity to the object. Name, Type and/or Parents are all typically useful. \n\n OTOH if application rules (today) require a Customer to have an Address, leave that to a setter. That is an example of a \"weak rule\". Maybe next week, you want to create a Customer object before going to the Enter Details screen?  Don't trip yourself up, leave possibility for unknown, incomplete or \"partially entered\" data. \n\n  Constructors: also, package private default constructor?  \n\n Yes, but use 'protected' rather than package private. Subclassing stuff is a real pain when the necessary internals are not visible. \n\n  Fields/Properties  \n\n Use 'property' field access for Hibernate, and from outside the instance. Within the instance, use the fields directly. Reason:  allows standard reflection, the simplest & most basic method for Hibernate, to work. \n\n As for fields 'immutable' to the application -- Hibernate still needs to be able to load these. You could try making these methods 'private', and/or put an annotation on them, to prevent application code making unwanted access. \n\n Note:  when writing an equals() function, use getters for values on the 'other' instance! Otherwise, you'll hit uninitialized/ empty fields on proxy instances. \n\n  Protected is better for (Hibernate) performance?  \n\n Unlikely. \n\n  Equals/HashCode?  \n\n This is relevant to working with entities, before they've been saved -- which is a thorny issue. Hashing/comparing on immutable values? In most business applications, there aren't any. \n\n A customer can change address, change the name of their business, etc etc -- not common, but it happens. Corrections also need to be possible to make, when the data was not entered correctly. \n\n The few things that are normally kept immutable, are Parenting and perhaps Type/Kind -- normally the user recreates the record, rather than changing these. But these do not uniquely identify the entity! \n\n So, long and short, the claimed \"immutable\" data isn't really. Primary Key/ ID fields are generated for the precise purpose, of providing such guaranteed stability & immutability. \n\n You need to plan & consider your need for comparison & hashing & request-processing work phases when A) working with \"changed/ bound data\" from the UI if you compare/hash on \"infrequently changed fields\", or B) working with \"unsaved data\", if you compare/hash on ID. \n\n  Equals/HashCode -- if a unique Business Key is not available, use a non-transient UUID which is created when the entity is initialized  \n\n Yes, this is a good strategy when required. Be aware that UUIDs are not free, performance-wise though -- and clustering complicates things. \n\n  Equals/HashCode -- never refer to related entities  \n\n \"If related entity (like a parent entity) needs to be part of the Business Key then add a non insertable, non updatable field to store the parent id (with the same name as the ManytoOne JoinColumn) and use this id in the equality check\" \n\n Sounds like good advice. \n\n Hope this helps!"
+  },
+  {
+    "title": "Explicit casting from super-class to sub-class",
+    "tag": "java",
+    "question_id": 4862960,
+    "views": 302535,
+    "answers": 8,
+    "link": "https://stackoverflow.com/questions/4862960/explicit-casting-from-super-class-to-sub-class",
+    "answer_text": "By using a cast you're essentially telling the compiler \"trust me. I'm a professional, I know what I'm doing and I know that although you can't guarantee it, I'm telling you that this `animal` variable is definitely going to be a dog.\" \n\n Since the animal isn't actually a dog (it's an animal, you could do `Animal animal = new Dog();` and it'd be a dog) the VM throws an exception at runtime because you've violated that trust (you told the compiler everything would be ok and it's not!) \n\n The compiler is a bit smarter than just blindly accepting everything, if you try and cast objects in different inheritence hierarchies (cast a Dog to a String for example) then the compiler will throw it back at you because it knows that could never possibly work. \n\n Because you're essentially just stopping the compiler from complaining, every time you cast it's important to check that you won't cause a `ClassCastException` by using `instanceof` in an if statement (or something to that effect.)"
+  },
+  {
+    "title": "Infinite Recursion with Jackson JSON and Hibernate JPA issue",
+    "tag": "java",
+    "question_id": 3325387,
+    "views": 472359,
+    "answers": 30,
+    "link": "https://stackoverflow.com/questions/3325387/infinite-recursion-with-jackson-json-and-hibernate-jpa-issue",
+    "answer_text": "You may use `@JsonIgnore` to break the cycle ( reference ). \n You need to import `org.codehaus.jackson.annotate.JsonIgnore` (legacy versions) or `com.fasterxml.jackson.annotation.JsonIgnore` (current versions)."
+  },
+  {
+    "title": "What is a segmentation fault?",
+    "tag": "c",
+    "question_id": 2346806,
+    "views": 1149264,
+    "answers": 17,
+    "link": "https://stackoverflow.com/questions/2346806/what-is-a-segmentation-fault",
+    "answer_text": "Segmentation fault is a specific kind of error caused by accessing memory that “does not belong to you.” It’s a helper mechanism that keeps you from corrupting the memory and introducing hard-to-debug memory bugs. Whenever you get a segfault you know you are doing something wrong with memory – accessing a variable that has already been freed, writing to a read-only portion of the memory, etc. Segmentation fault is essentially the same in most languages that let you mess with memory management, there is no principal difference between segfaults in C and C++. \n There are many ways to get a segfault, at least in the lower-level languages such as C(++). A common way to get a segfault is to dereference a null pointer: \n `int *p = NULL;\n*p = 1;\n` \n Another segfault happens when you try to write to a portion of memory that was marked as read-only: \n `char *str = \"Foo\"; // Compiler marks the constant string as read-only\n*str = 'b'; // Which means this is illegal and results in a segfault\n` \n Dangling pointer points to a thing that does not exist anymore, like here: \n `char *p = NULL;\n{\n    char c;\n    p = &c;\n}\n// Now p is dangling\n` \n The pointer `p` dangles because it points to the character variable `c` that ceased to exist after the block ended. And when you try to dereference dangling pointer (like `*p='A'`), you would probably get a segfault."
+  },
+  {
+    "title": "How do I concatenate const/literal strings in C?",
+    "tag": "c",
+    "question_id": 308695,
+    "views": 1401424,
+    "answers": 18,
+    "link": "https://stackoverflow.com/questions/308695/how-do-i-concatenate-const-literal-strings-in-c",
+    "answer_text": "In C, \"strings\" are just plain `char` arrays. Therefore, you can't directly concatenate them with other \"strings\". \n You can use the `strcat` function, which appends the string pointed to by `src` to the end of the string pointed to by `dest`: \n `char *strcat(char *dest, const char *src);\n` \n Here is an  example from cplusplus.com : \n `char str[80];\nstrcpy(str, \"these \");\nstrcat(str, \"strings \");\nstrcat(str, \"are \");\nstrcat(str, \"concatenated.\");\n` \n For the first parameter, you need to provide the destination buffer itself.  The destination buffer must be a char array buffer.  E.g.: `char buffer[1024];` \n  Make sure  that the first parameter has enough space to store what you're trying to copy into it.  If available to you, it is safer to use functions like: `strcpy_s` and `strcat_s` where you explicitly have to specify the size of the destination buffer. \n  Note : A string literal cannot be used as a buffer, since it is a constant. Thus, you always have to allocate a char array for the buffer. \n The return value of `strcat` can simply be ignored, it merely returns the same pointer as was passed in as the first argument. It is there for convenience, and allows you to chain the calls into one line of code: \n `strcat(strcat(str, foo), bar);\n` \n So your problem could be solved as follows: \n `char *foo = \"foo\";\nchar *bar = \"bar\";\nchar str[80];\nstrcpy(str, \"TEXT \");\nstrcat(str, foo);\nstrcat(str, bar);\n`"
+  },
+  {
+    "title": "What is an undefined reference/unresolved external symbol error and how do I fix it?",
+    "tag": "c++",
+    "question_id": 12573816,
+    "views": 1047628,
+    "answers": 40,
+    "link": "https://stackoverflow.com/questions/12573816/what-is-an-undefined-reference-unresolved-external-symbol-error-and-how-do-i-fix",
+    "answer_text": "Say you have the following code: \n `// a.cpp\nint get() { return 0; }\n` \n `// b.cpp\nint get(); // usually, one doesn't write this directly, but gets these\n           // declarations from included header files\nint x = get();\n` \n When compiling `b.cpp`, the compiler simply assumes that `get()` symbol was defined  somewhere , but it doesn't yet care where. The linking phase is responsible for finding the symbol and correctly linking the object files produced from `a.cpp` and `b.cpp`. \n If `a.cpp` didn't define `get`, you would get a linker error saying \"undefined reference\" or \"unresolved external symbol\". \n C++ Standard Wording \n Compiling a C++ program takes place in several phases specified in  [lex.phases] , the last of which is relevant: \n \n  9.  All external entity references are resolved.\nLibrary components are linked to satisfy external references to entities not defined in the current translation.\nAll such translator output is collected into a program image which contains information needed for execution in its execution environment. \n \n See  Keith Thompson's answer  for a summary of these phases. \n The specified errors occur during this last stage of compilation, most commonly referred to as linking. It basically means that you compiled a bunch of source files into object files or libraries, and now you want to get them to work together. \n Linker Errors in Practice \n If you're using Microsoft Visual Studio, you'll see that projects generate `.lib` files. These contain a table of exported symbols, and a table of imported symbols. The imported symbols are resolved against the libraries you link against, and the exported symbols are provided for the libraries that use that `.lib` (if any). \n Similar mechanisms exist for other compilers/ platforms. \n Common error messages are `error LNK2001`, `error LNK1120`, `error LNK2019` for  Microsoft Visual Studio  and `undefined reference to`  symbolName  for  GCC . \n The code: \n `struct X\n{\n   virtual void foo();\n};\nstruct Y : X\n{\n   void foo() {}\n};\nstruct A\n{\n   virtual ~A() = 0;\n};\nstruct B: A\n{\n   virtual ~B(){}\n};\nextern int x;\nvoid foo();\nint main()\n{\n   x = 0;\n   foo();\n   Y y;\n   B b;\n}\n` \n will generate the following errors with  GCC : \n `/home/AbiSfw/ccvvuHoX.o: In function `main':\nprog.cpp:(.text+0x10): undefined reference to `x'\nprog.cpp:(.text+0x19): undefined reference to `foo()'\nprog.cpp:(.text+0x2d): undefined reference to `A::~A()'\n/home/AbiSfw/ccvvuHoX.o: In function `B::~B()':\nprog.cpp:(.text._ZN1BD1Ev[B::~B()]+0xb): undefined reference to `A::~A()'\n/home/AbiSfw/ccvvuHoX.o: In function `B::~B()':\nprog.cpp:(.text._ZN1BD0Ev[B::~B()]+0x12): undefined reference to `A::~A()'\n/home/AbiSfw/ccvvuHoX.o:(.rodata._ZTI1Y[typeinfo for Y]+0x8): undefined reference to `typeinfo for X'\n/home/AbiSfw/ccvvuHoX.o:(.rodata._ZTI1B[typeinfo for B]+0x8): undefined reference to `typeinfo for A'\ncollect2: ld returned 1 exit status\n` \n and similar errors with  Microsoft Visual Studio : \n `1>test2.obj : error LNK2001: unresolved external symbol \"void __cdecl foo(void)\" (?foo@@YAXXZ)\n1>test2.obj : error LNK2001: unresolved external symbol \"int x\" (?x@@3HA)\n1>test2.obj : error LNK2001: unresolved external symbol \"public: virtual __thiscall A::~A(void)\" (??1A@@UAE@XZ)\n1>test2.obj : error LNK2001: unresolved external symbol \"public: virtual void __thiscall X::foo(void)\" (?foo@X@@UAEXXZ)\n1>...\\test2.exe : fatal error LNK1120: 4 unresolved externals\n` \n Common Causes \n \n  Failure to link against appropriate libraries/object files or compile implementation files  \n  Declared and undefined variable or function.  \n  Common issues with class-type members  \n  Template implementations not visible.  \n  Symbols were defined in a C program and used in C++ code.  \n  Incorrectly importing/exporting methods/classes across modules/dll. (MSVS specific)  \n  Circular library dependency  \n  undefined reference to `WinMain@16'  \n  Interdependent library order  \n  Multiple source files of the same name  \n  Mistyping or not including the .lib extension when using the `#pragma` (Microsoft Visual Studio)  \n  Problems with template friends  \n  Inconsistent `UNICODE` definitions  \n  Missing \"extern\" in const variable declarations/definitions (C++ only)  \n  Visual Studio Code not configured for a multiple file project  \n  Errors on Mac OS X when building a dylib, but a .so on other Unix-y systems is OK  \n  Your linkage consumes libraries before the object files that refer to them  \n  Your linkage contains C++ object files and C++ libraries originating from different C++ compilers"
+  },
+  {
+    "title": "Undefined reference to vtable",
+    "tag": "c++",
+    "question_id": 3065154,
+    "views": 957274,
+    "answers": 21,
+    "link": "https://stackoverflow.com/questions/3065154/undefined-reference-to-vtable",
+    "answer_text": "So, I've figured out the issue and it was a combination of bad logic and not being totally familiar with the automake/autotools world. I was adding the correct files to my Makefile.am template, but I wasn't sure which step in our build process actually created the makefile itself. So, I was compiling with an old makefile that had no idea about my new files whatsoever. \n\n Thanks for the responses and the link to the GCC FAQ. I will be sure to read that to avoid this problem occurring for a real reason."
+  },
+  {
+    "title": "How to move one field out of a struct that implements Drop trait?",
+    "tag": "rust",
+    "question_id": 31307680,
+    "views": 17014,
+    "answers": 3,
+    "link": "https://stackoverflow.com/questions/31307680/how-to-move-one-field-out-of-a-struct-that-implements-drop-trait",
+    "answer_text": "You can use  `std::mem::replace()`  to swap the field with a new blank value in order to transfer ownership to you: \n\n `extern crate hyper;\n\nfn just_the_headers() -> Result<hyper::header::Headers, hyper::error::Error> {\n    let c = hyper::client::Client::new();\n    let result = c.get(\"http://www.example.com\").send();\n    match result {\n        Err(e) => Err(e),\n        Ok(mut response) => Ok(std::mem::replace(&mut response.headers, hyper::header::Headers::new())),\n    }\n}\n\nfn main() {\n    println!(\"{:?}\", just_the_headers());\n}\n` \n\n Here, we're replacing `response.headers` with a new empty set of headers. `replace()` returns the value that was stored in the field before we replaced it."
+  },
+  {
+    "title": "Why can't I store a value and a reference to that value in the same struct?",
+    "tag": "rust",
+    "question_id": 32300132,
+    "views": 72214,
+    "answers": 5,
+    "link": "https://stackoverflow.com/questions/32300132/why-cant-i-store-a-value-and-a-reference-to-that-value-in-the-same-struct",
+    "answer_text": "Let's look at  a simple implementation of this : \n `struct Parent {\n    count: u32,\n}\n\nstruct Child<'a> {\n    parent: &'a Parent,\n}\n\nstruct Combined<'a> {\n    parent: Parent,\n    child: Child<'a>,\n}\n\nimpl<'a> Combined<'a> {\n    fn new() -> Self {\n        let parent = Parent { count: 42 };\n        let child = Child { parent: &parent };\n\n        Combined { parent, child }\n    }\n}\n\nfn main() {}\n` \n This will fail with the error: \n `error[E0515]: cannot return value referencing local variable `parent`\n  --> src/main.rs:19:9\n   |\n17 |         let child = Child { parent: &parent };\n   |                                     ------- `parent` is borrowed here\n18 | \n19 |         Combined { parent, child }\n   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^ returns a value referencing data owned by the current function\n\nerror[E0505]: cannot move out of `parent` because it is borrowed\n  --> src/main.rs:19:20\n   |\n14 | impl<'a> Combined<'a> {\n   |      -- lifetime `'a` defined here\n...\n17 |         let child = Child { parent: &parent };\n   |                                     ------- borrow of `parent` occurs here\n18 | \n19 |         Combined { parent, child }\n   |         -----------^^^^^^---------\n   |         |          |\n   |         |          move out of `parent` occurs here\n   |         returning this value requires that `parent` is borrowed for `'a`\n` \n To completely understand this error, you have to think about how the\nvalues are represented in memory and what happens when you  move \nthose values. Let's annotate `Combined::new` with some hypothetical\nmemory addresses that show where values are located: \n `let parent = Parent { count: 42 };\n// `parent` lives at address 0x1000 and takes up 4 bytes\n// The value of `parent` is 42 \nlet child = Child { parent: &parent };\n// `child` lives at address 0x1010 and takes up 4 bytes\n// The value of `child` is 0x1000\n         \nCombined { parent, child }\n// The return value lives at address 0x2000 and takes up 8 bytes\n// `parent` is moved to 0x2000\n// `child` is ... ?\n` \n What should happen to `child`? If the value was just moved like `parent`\nwas, then it would refer to memory that no longer is guaranteed to\nhave a valid value in it. Any other piece of code is allowed to store\nvalues at memory address 0x1000. Accessing that memory assuming it was\nan integer could lead to crashes and/or security bugs, and is one of\nthe main categories of errors that Rust prevents. \n This is exactly the problem that  lifetimes  prevent. A lifetime is a\nbit of metadata that allows you and the compiler to know how long a\nvalue will be valid at its  current memory location . That's an\nimportant distinction, as it's a common mistake Rust newcomers make.\nRust lifetimes are  not  the time period between when an object is\ncreated and when it is destroyed! \n As an analogy, think of it this way: During a person's life, they will\nreside in many different locations, each with a distinct address. A\nRust lifetime is concerned with the address you  currently reside at ,\nnot about whenever you will die in the future (although dying also\nchanges your address). Every time you move it's relevant because your\naddress is no longer valid. \n It's also important to note that lifetimes  do not  change your code; your\ncode controls the lifetimes, your lifetimes don't control the code. The\npithy saying is \"lifetimes are descriptive, not prescriptive\". \n Let's annotate `Combined::new` with some line numbers which we will use\nto highlight lifetimes: \n `{                                          // 0\n    let parent = Parent { count: 42 };     // 1\n    let child = Child { parent: &parent }; // 2\n                                           // 3\n    Combined { parent, child }             // 4\n}                                          // 5\n` \n The  concrete lifetime  of `parent` is from 1 to 4, inclusive (which I'll\nrepresent as `[1,4]`). The concrete lifetime of `child` is `[2,4]`, and\nthe concrete lifetime of the return value is `[4,5]`. It's\npossible to have concrete lifetimes that start at zero - that would\nrepresent the lifetime of a parameter to a function or something that\nexisted outside of the block. \n Note that the lifetime of `child` itself is `[2,4]`, but that it  refers\nto  a value with a lifetime of `[1,4]`. This is fine as long as the\nreferring value becomes invalid before the referred-to value does. The\nproblem occurs when we try to return `child` from the block. This would\n\"over-extend\" the lifetime beyond its natural length. \n This new knowledge should explain the first two examples. The third\none requires looking at the implementation of `Parent::child`. Chances\nare, it will look something like this: \n `impl Parent {\n    fn child(&self) -> Child { /* ... */ }\n}\n` \n This uses  lifetime elision  to avoid writing explicit  generic\nlifetime parameters . It is equivalent to: \n `impl Parent {\n    fn child<'a>(&'a self) -> Child<'a> { /* ... */ }\n}\n` \n In both cases, the method says that a `Child` structure will be\nreturned that has been parameterized with the concrete lifetime of\n`self`. Said another way, the `Child` instance contains a reference\nto the `Parent` that created it, and thus cannot live longer than that\n`Parent` instance. \n This also lets us recognize that something is really wrong with our\ncreation function: \n `fn make_combined<'a>() -> Combined<'a> { /* ... */ }\n` \n Although you are more likely to see this written in a different form: \n `impl<'a> Combined<'a> {\n    fn new() -> Combined<'a> { /* ... */ }\n}\n` \n In both cases, there is no lifetime parameter being provided via an\nargument. This means that the lifetime that `Combined` will be\nparameterized with isn't constrained by anything - it can be whatever\nthe caller wants it to be. This is nonsensical, because the caller\ncould specify the `'static` lifetime and there's no way to meet that\ncondition. \n How do I fix it? \n The easiest and most recommended solution is to not attempt to put\nthese items in the same structure together. By doing this, your\nstructure nesting will mimic the lifetimes of your code. Place types\nthat own data into a structure together and then provide methods that\nallow you to get references or objects containing references as needed. \n There is a special case where the lifetime tracking is overzealous:\nwhen you have something placed on the heap. This occurs when you use a\n`Box<T>`, for example. In this case, the structure that is moved\ncontains a pointer into the heap. The pointed-at value will remain\nstable, but the address of the pointer itself will move. In practice,\nthis doesn't matter, as you always follow the pointer. \n Some crates provide ways of representing this case, but they\nrequire that the base address  never move . This rules out mutating\nvectors, which may cause a reallocation and a move of the\nheap-allocated values. \n \n   rental   (no longer maintained or supported) \n   owning_ref   (has  multiple soundness issues ) \n  ouroboros  \n  self_cell  \n  yoke  \n  nolife  \n \n Examples of problems solved with Rental: \n \n  Is there an owned version of String::chars?  \n  Returning a RWLockReadGuard independently from a method  \n  How can I return an iterator over a locked struct member in Rust?  \n  How to return a reference to a sub-value of a value that is under a mutex?  \n  How do I store a result using Serde Zero-copy deserialization of a Futures-enabled Hyper Chunk?  \n  How to store a reference without having to deal with lifetimes?  \n \n In other cases, you may wish to move to some type of reference-counting, such as by using  `Rc`  or  `Arc` . \n More information \n \n After moving `parent` into the struct, why is the compiler not able to get a new reference to `parent` and assign it to `child` in the struct? \n \n While it is theoretically possible to do this, doing so would introduce a large amount of complexity and overhead. Every time that the object is moved, the compiler would need to insert code to \"fix up\" the reference. This would mean that copying a struct is no longer a very cheap operation that just moves some bits around. It could even mean that code like this is expensive, depending on how good a hypothetical optimizer would be: \n `let a = Object::new();\nlet b = a;\nlet c = b;\n` \n Instead of forcing this to happen for  every  move, the programmer gets to  choose  when this will happen by creating methods that will take the appropriate references only when you call them. \n A type with a reference to itself \n There's one specific case where you  can  create a type with a reference to itself. You need to use something like `Option` to make it in two steps though: \n `#[derive(Debug)]\nstruct WhatAboutThis<'a> {\n    name: String,\n    nickname: Option<&'a str>,\n}\n\nfn main() {\n    let mut tricky = WhatAboutThis {\n        name: \"Annabelle\".to_string(),\n        nickname: None,\n    };\n    tricky.nickname = Some(&tricky.name[..4]);\n\n    println!(\"{:?}\", tricky);\n}\n` \n This does work, in some sense, but the created value is highly restricted - it can  never  be moved. Notably, this means it cannot be returned from a function or passed by-value to anything. A constructor function shows the same problem with the lifetimes as above: \n `fn creator<'a>() -> WhatAboutThis<'a> { /* ... */ }\n` \n If you try to do this same code with a method, you'll need the alluring but ultimately useless `&'a self`. When that's involved, this code is even more restricted and you will get borrow-checker errors after the first method call: \n `#[derive(Debug)]\nstruct WhatAboutThis<'a> {\n    name: String,\n    nickname: Option<&'a str>,\n}\n\nimpl<'a> WhatAboutThis<'a> {\n    fn tie_the_knot(&'a mut self) {\n       self.nickname = Some(&self.name[..4]); \n    }\n}\n\nfn main() {\n    let mut tricky = WhatAboutThis {\n        name: \"Annabelle\".to_string(),\n        nickname: None,\n    };\n    tricky.tie_the_knot();\n\n    // cannot borrow `tricky` as immutable because it is also borrowed as mutable\n    // println!(\"{:?}\", tricky);\n}\n` \n See also: \n \n  Cannot borrow as mutable more than once at a time in one code - but can in another very similar  \n \n What about `Pin`? \n  `Pin` , stabilized in Rust 1.33, has this  in the module documentation : \n \n A prime example of such a scenario would be building self-referential structs, since moving an object with pointers to itself will invalidate them, which could cause undefined behavior. \n \n It's important to note that \"self-referential\" doesn't necessarily mean using  a reference . Indeed, the  example of a self-referential struct  specifically says (emphasis mine): \n \n We cannot inform the compiler about that with a normal reference,\nsince this pattern cannot be described with the usual borrowing rules.\nInstead  we use a raw pointer , though one which is known to not be null,\nsince we know it's pointing at the string. \n \n The ability to use a raw pointer for this behavior has existed since Rust 1.0. Indeed, owning-ref and rental use raw pointers under the hood. \n The only thing that `Pin` adds to the table is a common way to state that a given value is guaranteed to not move. \n See also: \n \n  How to use the Pin struct with self-referential structures?"
+  },
+  {
+    "title": "What is most idiomatic way to create an iterator in Go?",
+    "tag": "go",
+    "question_id": 14000534,
+    "views": 72108,
+    "answers": 13,
+    "link": "https://stackoverflow.com/questions/14000534/what-is-most-idiomatic-way-to-create-an-iterator-in-go",
+    "answer_text": "Channels are useful, but closures are often more suitable. \n\n `package main\n\nimport \"fmt\"\n\nfunc main() {\n    gen := newEven()\n    fmt.Println(gen())\n    fmt.Println(gen())\n    fmt.Println(gen())\n    gen = nil // release for garbage collection\n}\n\nfunc newEven() func() int {\n    n := 0\n    // closure captures variable n\n    return func() int {\n        n += 2\n        return n\n    }\n}\n` \n\n Playground:  http://play.golang.org/p/W7pG_HUOzw  \n\n Don't like closures either?  Use a named type with a method: \n\n `package main\n\nimport \"fmt\"\n\nfunc main() {\n    gen := even(0)\n    fmt.Println(gen.next())\n    fmt.Println(gen.next())\n    fmt.Println(gen.next())\n}\n\ntype even int\n\nfunc (e *even) next() int {\n    *e += 2\n    return int(*e)\n}\n` \n\n Playground:  http://play.golang.org/p/o0lerLcAh3  \n\n There are tradeoffs among the three techniques so you can't nominate one as idiomatic.  Use whatever best meets your needs. \n\n Chaining is easy because functions are first class objects.  Here's an extension of the closure example.  I added a type intGen for integer generator which makes it clear where generator functions are used as arguments and return values.  mapInt is defined in a general way to map any integer function to an integer generator.  Other functions such as filter and fold could be defined similarly. \n\n `package main\n\nimport \"fmt\"\n\nfunc main() {\n    gen := mapInt(newEven(), square)\n    fmt.Println(gen())\n    fmt.Println(gen())\n    fmt.Println(gen())\n    gen = nil // release for garbage collection\n}\n\ntype intGen func() int\n\nfunc newEven() intGen {\n    n := 0\n    return func() int {\n        n += 2\n        return n\n    }\n}\n\nfunc mapInt(g intGen, f func(int) int) intGen {\n    return func() int {\n        return f(g())\n    }\n}\n\nfunc square(i int) int {\n    return i * i\n}\n` \n\n Playground:  http://play.golang.org/p/L1OFm6JuX0"
+  },
+  {
+    "title": "How to test panics?",
+    "tag": "go",
+    "question_id": 31595791,
+    "views": 90210,
+    "answers": 11,
+    "link": "https://stackoverflow.com/questions/31595791/how-to-test-panics",
+    "answer_text": "`testing` doesn't really have the concept of \"success,\" only failure. So your code above is about right. You might find this style slightly more clear, but it's basically the same thing. \n\n `func TestPanic(t *testing.T) {\n    defer func() {\n        if r := recover(); r == nil {\n            t.Errorf(\"The code did not panic\")\n        }\n    }()\n\n    // The following is the code under test\n    OtherFunctionThatPanics()\n}\n` \n\n I generally find `testing` to be fairly weak. You may be interested in more powerful testing engines like  Ginkgo . Even if you don't want the full Ginkgo system, you can use just its matcher library,  Gomega , which can be used along with `testing`. Gomega includes matchers like: \n\n `Expect(OtherFunctionThatPanics).To(Panic())\n` \n\n You can also wrap up panic-checking into a simple function: \n\n `func TestPanic(t *testing.T) {\n    assertPanic(t, OtherFunctionThatPanics)\n}\n\nfunc assertPanic(t *testing.T, f func()) {\n    defer func() {\n        if r := recover(); r == nil {\n            t.Errorf(\"The code did not panic\")\n        }\n    }()\n    f()\n}\n`"
+  }
+]
