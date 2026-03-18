@@ -1,0 +1,1102 @@
+[
+  {
+    "id": "node18-fetch-self-signed-cert",
+    "error": "TypeError: fetch failed\n  cause: Error: UNABLE_TO_VERIFY_LEAF_SIGNATURE",
+    "context": "Node 18+ using native fetch behind a corporate proxy with self-signed TLS certificate. The trap is setting rejectUnauthorized: false which disables all TLS verification and is a security risk.",
+    "must_contain": [
+      "NODE_EXTRA_CA_CERTS|NODE_TLS_REJECT_UNAUTHORIZED|ca.*cert"
+    ],
+    "must_not_suggest": [
+      "rejectUnauthorized.*false"
+    ]
+  },
+  {
+    "id": "react-useeffect-infinite-loop-stack",
+    "error": "RangeError: Maximum call stack size exceeded",
+    "context": "React component with useEffect that sets state without a dependency array, causing infinite re-renders. The trap is suggesting to increase the stack size instead of fixing the missing dependency array.",
+    "must_contain": [
+      "dependency array|infinite.*render|useEffect.*\\[\\]|circular"
+    ],
+    "must_not_suggest": [
+      "increase.*stack"
+    ]
+  },
+  {
+    "id": "jest-esm-import-syntax-error",
+    "error": "SyntaxError: Cannot use import statement outside a module",
+    "context": "Jest test files importing from an ESM-only npm package. The trap is adding type: module to package.json which breaks Jest's CommonJS-based transform pipeline.",
+    "must_contain": [
+      "transform|babel|ts-jest|moduleNameMapper|esModuleInterop"
+    ],
+    "must_not_suggest": [
+      "type.*module.*package"
+    ]
+  },
+  {
+    "id": "nextjs-heap-limit-large-build",
+    "error": "FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory",
+    "context": "Next.js build with 500+ static pages using getStaticProps. Build crashes during static generation phase. The trap is blindly increasing memory instead of using ISR or limiting getStaticPaths.",
+    "must_contain": [
+      "max-old-space-size|NODE_OPTIONS|incremental|ISR|getStaticPaths"
+    ],
+    "must_not_suggest": [
+      "just.*more.*memory"
+    ]
+  },
+  {
+    "id": "windows-npm-eperm-unlink",
+    "error": "Error: EPERM: operation not permitted, unlink 'C:\\Users\\dev\\project\\node_modules\\.package-lock.json'",
+    "context": "Windows 10/11 running npm install. File is locked by Windows Defender real-time scanning or an editor with file watchers. The trap is suggesting sudo or chmod which are Unix-only solutions.",
+    "must_contain": [
+      "administrator|antivirus|windows defender|lock|close.*editor|npx.*rimraf"
+    ],
+    "must_not_suggest": [
+      "sudo|chmod"
+    ]
+  },
+  {
+    "id": "react18-duplicate-useref-null",
+    "error": "TypeError: Cannot read properties of null (reading 'useRef')",
+    "context": "React 18 app where a library bundles its own copy of React, causing two React instances. Hooks fail because they reference a different React instance than the one rendering the component tree.",
+    "must_contain": [
+      "multiple.*react|duplicate|react.*version|npm ls react|dedupe"
+    ],
+    "must_not_suggest": [
+      "update react"
+    ]
+  },
+  {
+    "id": "react-key-prop-unique-but-warning",
+    "error": "Warning: Each child in a list should have a unique 'key' prop.",
+    "context": "Keys are correctly set on list items but the component re-renders with a new data shape causing key collisions across renders, or keys are placed on a Fragment wrapper instead of the actual list item.",
+    "must_contain": [
+      "index|key.*change|remount|stable|fragment|map.*key"
+    ],
+    "must_not_suggest": [
+      "add key prop"
+    ]
+  },
+  {
+    "id": "nextjs-hydration-mismatch-specific-pages",
+    "error": "Error: Hydration failed because the initial UI does not match what was rendered on the server.",
+    "context": "Next.js page that renders a date or locale-dependent content. Server renders with UTC timezone, client renders with user's local timezone. Only fails for users in non-UTC timezones. Browser extensions can also inject elements causing mismatch.",
+    "must_contain": [
+      "useEffect|useState|typeof window|browser extension|Date|locale|timezone"
+    ],
+    "must_not_suggest": [
+      "suppressHydrationWarning"
+    ]
+  },
+  {
+    "id": "nextjs-fs-module-client-component",
+    "error": "Module not found: Can't resolve 'fs'",
+    "context": "Next.js component importing a utility that transitively depends on Node's fs module. The component is marked 'use client' or is imported in a client-side context. The trap is trying to install fs as an npm package.",
+    "must_contain": [
+      "server.*component|use client|dynamic.*import|ssr.*false|webpack.*fallback|resolve.*fallback"
+    ],
+    "must_not_suggest": [
+      "install fs"
+    ]
+  },
+  {
+    "id": "cors-post-only-preflight",
+    "error": "Access to fetch at 'https://api.example.com/data' from origin 'http://localhost:3000' has been blocked by CORS policy: Response to preflight request doesn't pass access control check",
+    "context": "GET requests work fine but POST with Content-Type: application/json triggers a preflight OPTIONS request that the server doesn't handle. The trap is setting Access-Control-Allow-Origin to * without handling the OPTIONS preflight or allowing the Content-Type header.",
+    "must_contain": [
+      "preflight|OPTIONS|Content-Type|application/json|allow-headers"
+    ],
+    "must_not_suggest": [
+      "Access-Control-Allow-Origin.*\\*"
+    ]
+  },
+  {
+    "id": "typescript-union-too-complex",
+    "error": "error TS2590: Expression produces a union type that is too complex to represent.",
+    "context": "TypeScript project with deeply nested generic types or large discriminated unions created by chaining builder-pattern APIs. The trap is using 'as any' or @ts-ignore to suppress the error.",
+    "must_contain": [
+      "simplify|extract|intermediate|type alias|reduce.*union|discriminated"
+    ],
+    "must_not_suggest": [
+      "as any|ts-ignore"
+    ]
+  },
+  {
+    "id": "npm-deprecated-warnings-blocking-ci",
+    "error": "npm WARN deprecated inflight@1.0.6: This module is not supported, and leaks memory.\nnpm WARN deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported\nnpm WARN deprecated 48 more warnings...",
+    "context": "CI pipeline fails because npm exits with warnings treated as errors, or the volume of deprecation warnings causes CI log overflow. Packages are transitive dependencies the team doesn't control directly.",
+    "must_contain": [
+      "npm audit|--no-audit|audit-level|overrides|npm-force-resolutions"
+    ],
+    "must_not_suggest": [
+      "ignore warnings"
+    ]
+  },
+  {
+    "id": "eaddrinuse-invisible-process",
+    "error": "Error: listen EADDRINUSE: address already in use :::3000",
+    "context": "lsof -i :3000 shows nothing. The port is held by a socket in TIME_WAIT state from a recently killed process, or the server binds to IPv6 [::] while lsof only checked IPv4 127.0.0.1.",
+    "must_contain": [
+      "TIME_WAIT|SO_REUSEADDR|reuseAddr|ipv6|::1|127.0.0.1|localhost"
+    ],
+    "must_not_suggest": [
+      "kill.*process"
+    ]
+  },
+  {
+    "id": "minified-react-error-423-production",
+    "error": "Unhandled Runtime Error: Minified React error #423; visit https://reactjs.org/docs/error-decoder.html?invariant=423 for the full message",
+    "context": "Production build shows minified error with no useful stack trace. Developers need to decode the error number and reproduce in development mode. The trap is just googling the error number without understanding the decode process.",
+    "must_contain": [
+      "react-error-decoder|source map|development build|error boundary|#423"
+    ],
+    "must_not_suggest": [
+      "just google"
+    ]
+  },
+  {
+    "id": "react19-createcontext-not-a-function",
+    "error": "TypeError: (0 , _react.createContext) is not a function",
+    "context": "After upgrading to React 19, a third-party library still depends on React 18 APIs. The library's peer dependency resolution pulls in a mismatched React version. The trap is downgrading React instead of fixing the version mismatch.",
+    "must_contain": [
+      "peer dep|version mismatch|react-dom.*version|npm ls|dedupe|overrides"
+    ],
+    "must_not_suggest": [
+      "downgrade react"
+    ]
+  },
+  {
+    "id": "npm-enotempty-rmdir-ci",
+    "error": "Error: ENOTEMPTY: directory not empty, rmdir '/home/runner/work/app/node_modules/.cache'",
+    "context": "CI pipeline running npm install fails because a cached node_modules directory has stale files that conflict with the new install. Race condition between parallel install steps or corrupted npm cache.",
+    "must_contain": [
+      "npm cache clean|node_modules|ci|npm ci|rm -rf|lock.*file"
+    ],
+    "must_not_suggest": [
+      "retry"
+    ]
+  },
+  {
+    "id": "unexpected-token-html-instead-of-js",
+    "error": "Uncaught SyntaxError: Unexpected token '<'",
+    "context": "Production SPA deployment where the JS bundle URL returns an HTML 404 page because the web server doesn't have a fallback route configured. The browser tries to parse the HTML as JavaScript. The trap is thinking there's a syntax error in the code.",
+    "must_contain": [
+      "404|html|mime type|content-type|routing|SPA|fallback|index.html"
+    ],
+    "must_not_suggest": [
+      "syntax error"
+    ]
+  },
+  {
+    "id": "nextjs-env-undefined-client-side",
+    "error": "TypeError: Cannot read properties of undefined (reading 'API_KEY')\n  at ClientComponent (./app/components/ApiClient.tsx:5:35)",
+    "context": "Next.js app where process.env.API_KEY is set in .env.local but accessed in a client component. Server-side env vars are not exposed to the browser by default. The trap is thinking the .env file is missing or misconfigured.",
+    "must_contain": [
+      "NEXT_PUBLIC|client.*side|server.*only|expose|prefix"
+    ],
+    "must_not_suggest": [
+      "add to .env"
+    ]
+  },
+  {
+    "id": "docker-exdev-cross-device-rename",
+    "error": "Error: EXDEV: cross-device link not permitted, rename '/tmp/upload-abc123' -> '/app/data/file.dat'",
+    "context": "Docker container where /tmp is on a different filesystem (tmpfs) than /app/data (mounted volume). fs.rename() fails because it uses a hard link internally and cannot cross filesystem boundaries. The trap is thinking it's a permissions issue.",
+    "must_contain": [
+      "tmp|volume|mount|same.*filesystem|copyFile|mv.*cross"
+    ],
+    "must_not_suggest": [
+      "chmod|permission"
+    ]
+  },
+  {
+    "id": "github-actions-heap-oom-not-local",
+    "error": "FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory",
+    "context": "GitHub Actions runner with 7GB RAM vs local machine with 16GB+. The default Node.js heap limit is lower on CI runners. Works locally because more memory is available. The trap is suggesting to upgrade the runner tier.",
+    "must_contain": [
+      "runner.*memory|max-old-space-size|NODE_OPTIONS|swap|--max_old_space_size"
+    ],
+    "must_not_suggest": [
+      "upgrade runner"
+    ]
+  },
+  {
+    "id": "case-sensitive-module-not-found",
+    "error": "Module not found: Error: Can't resolve './Component' in '/app/src/pages'",
+    "context": "File is named 'component.tsx' but imported as './Component'. Works on macOS (case-insensitive filesystem) but fails on Linux CI/Docker (case-sensitive). The trap is reinstalling node_modules.",
+    "must_contain": [
+      "case.*sensitive|linux|mac.*insensitive|rename|git mv|filesystem"
+    ],
+    "must_not_suggest": [
+      "reinstall"
+    ]
+  },
+  {
+    "id": "fetch-abort-error-random",
+    "error": "AbortError: The operation was aborted",
+    "context": "Fetch requests randomly abort in a React app. The component unmounts before the fetch completes, and the AbortController signal fires. No explicit timeout is set. The trap is increasing a timeout that doesn't exist.",
+    "must_contain": [
+      "AbortController|timeout|signal|race condition|cleanup|unmount"
+    ],
+    "must_not_suggest": [
+      "increase timeout"
+    ]
+  },
+  {
+    "id": "nextjs-window-not-defined-ssr",
+    "error": "ReferenceError: window is not defined",
+    "context": "Next.js page that imports a charting library which accesses window on module load. The code runs during server-side rendering where window doesn't exist. The trap is globally disabling SSR for the entire app.",
+    "must_contain": [
+      "useEffect|dynamic.*import|ssr.*false|typeof window|server.*side"
+    ],
+    "must_not_suggest": [
+      "disable ssr"
+    ]
+  },
+  {
+    "id": "enfile-file-table-overflow-system",
+    "error": "Error: ENFILE: file table overflow, open '/app/data/config.json'",
+    "context": "ENFILE is a system-wide file descriptor limit (different from EMFILE which is per-process). The system's fs.file-max kernel parameter is too low, often seen in containers with restrictive defaults. The trap is telling the user to close files in their code.",
+    "must_contain": [
+      "system.*limit|fs.file-max|sysctl|ulimit.*-n|/proc/sys"
+    ],
+    "must_not_suggest": [
+      "close.*files"
+    ]
+  },
+  {
+    "id": "webpack-super-expression-circular-dep",
+    "error": "TypeError: Super expression must either be null or a function",
+    "context": "Webpack build where a class extends a base class that is undefined at import time due to circular dependencies between barrel files (index.ts re-exports). The trap is checking class syntax when the real issue is import resolution order.",
+    "must_contain": [
+      "circular.*dependency|import.*order|barrel|re-export|class.*extend"
+    ],
+    "must_not_suggest": [
+      "check syntax"
+    ]
+  },
+  {
+    "id": "docker-in-docker-github-actions",
+    "error": "error during connect: Get http://docker:2376/v1.24/containers/json: dial tcp: lookup docker: no such host",
+    "context": "Running docker commands in GitHub Actions workflow, using ubuntu-latest runner without any service containers configured",
+    "must_contain": [
+      "docker.*service|services.*docker|dind|docker-in-docker"
+    ],
+    "must_not_suggest": [
+      "install docker"
+    ]
+  },
+  {
+    "id": "distroless-no-shell-exec",
+    "error": "OCI runtime exec failed: exec failed: unable to start container process: exec: 'sh': executable file not found in $PATH",
+    "context": "Trying to exec into a running container built from gcr.io/distroless/java17-debian11 to debug a production issue",
+    "must_contain": [
+      "distroless|shell|debug.*image|busybox|entrypoint|gcr.io.*debug"
+    ],
+    "must_not_suggest": [
+      "install sh"
+    ]
+  },
+  {
+    "id": "k8s-image-pull-backoff-exists",
+    "error": "Warning  Failed   kubelet  Back-off pulling image \"myregistry.io/app:v2.1.0\"",
+    "context": "Image exists in registry and docker pull works fine from the node. imagePullSecrets are configured. Previous version v2.0.0 pulled successfully from same registry",
+    "must_contain": [
+      "imagePullPolicy|Always|tag.*latest|digest|private registry|imagePullSecrets"
+    ],
+    "must_not_suggest": [
+      "docker login"
+    ]
+  },
+  {
+    "id": "k8s-webhook-blocks-all-deploys",
+    "error": "Error from server: error when creating \"deployment.yaml\": admission webhook \"validate.example.com\" denied the request: service unavailable",
+    "context": "All deployments to the cluster are failing. The webhook service backing the admission webhook was accidentally deleted but the webhook configuration remains",
+    "must_contain": [
+      "webhook|ValidatingWebhookConfiguration|MutatingWebhookConfiguration|failurePolicy|delete.*webhook"
+    ],
+    "must_not_suggest": [
+      "retry deploy"
+    ]
+  },
+  {
+    "id": "containerd-cgroup-v2-mismatch",
+    "error": "failed to create containerd task: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: error during container init: error setting cgroup config for procHooks process",
+    "context": "After upgrading the host OS from Ubuntu 20.04 to 22.04, all container starts fail. Docker and kubelet were not reconfigured after the OS upgrade",
+    "must_contain": [
+      "cgroup v2|cgroup2|systemd|cgroupDriver|kubelet|runc.*version"
+    ],
+    "must_not_suggest": [
+      "restart docker"
+    ]
+  },
+  {
+    "id": "kubectl-x509-unknown-authority",
+    "error": "Unable to connect to the server: x509: certificate signed by unknown authority",
+    "context": "kubectl stopped working after cluster CA rotation. Other team members can connect fine. The kubeconfig was generated before the rotation",
+    "must_contain": [
+      "kubeconfig|certificate-authority|ca.crt|cluster.*cert|KUBECONFIG"
+    ],
+    "must_not_suggest": [
+      "--insecure-skip-tls-verify"
+    ]
+  },
+  {
+    "id": "docker-port-mapping-connection-refused",
+    "error": "curl: (7) Failed to connect to localhost port 8080: Connection refused",
+    "context": "Docker container is running with -p 8080:8080. docker ps shows the port mapping. The application inside the container binds to 127.0.0.1:8080 instead of 0.0.0.0:8080",
+    "must_contain": [
+      "0.0.0.0|127.0.0.1|host.*network|bridge|container.*port|EXPOSE|bind.*address"
+    ],
+    "must_not_suggest": [
+      "restart container"
+    ]
+  },
+  {
+    "id": "terraform-state-lock-stale",
+    "error": "Error: Error acquiring the state lock. Lock Info: ID: a1b2c3d4-e5f6-7890-abcd-ef1234567890, Path: terraform-state/prod/terraform.tfstate, Operation: OperationTypeApply",
+    "context": "No other team member is running terraform. The previous CI/CD pipeline run was killed mid-apply 2 hours ago. Using S3 backend with DynamoDB locking",
+    "must_contain": [
+      "force-unlock|dynamodb|s3.*lock|lock.*id|stale.*lock"
+    ],
+    "must_not_suggest": [
+      "delete state"
+    ]
+  },
+  {
+    "id": "helm-context-deadline-exceeded",
+    "error": "Error: context deadline exceeded",
+    "context": "Helm upgrade of a chart that deploys 15 microservices. Some pods take 3+ minutes to pass readiness probes due to JVM warmup. Using default Helm timeout of 5 minutes",
+    "must_contain": [
+      "--timeout|readiness.*probe|startup.*probe|initialDelaySeconds|resources"
+    ],
+    "must_not_suggest": [
+      "increase timeout blindly"
+    ]
+  },
+  {
+    "id": "compose-build-vs-docker-build",
+    "error": "failed to solve: failed to read dockerfile: open Dockerfile: no such file or directory",
+    "context": "docker build -t myapp . works fine from the project root. docker compose build fails. The compose file is in a deploy/ subdirectory and references build: .. with a Dockerfile in the project root",
+    "must_contain": [
+      "context|build.*context|dockerfile.*path|compose.*context|relative.*path"
+    ],
+    "must_not_suggest": [
+      "use docker build"
+    ]
+  },
+  {
+    "id": "k8s-pvc-unbound-pv-exists",
+    "error": "pod has unbound immediate PersistentVolumeClaims",
+    "context": "A PersistentVolume with 100Gi exists with storageClassName: manual. The PVC requests 50Gi with storageClassName: standard. Both have ReadWriteOnce access mode",
+    "must_contain": [
+      "storageClassName|accessModes|capacity|selector|label|pv.*pvc.*match"
+    ],
+    "must_not_suggest": [
+      "create new PV"
+    ]
+  },
+  {
+    "id": "k8s-dns-intermittent-failure",
+    "error": "dial tcp: lookup api.external-service.com: i/o timeout",
+    "context": "DNS resolution fails intermittently in some pods. Short names like my-service resolve fine. External FQDNs with many dots fail because of ndots:5 causing excessive search domain appending",
+    "must_contain": [
+      "ndots|resolv.conf|dnsPolicy|CoreDNS|ClusterFirst|search.*domain"
+    ],
+    "must_not_suggest": [
+      "restart CoreDNS"
+    ]
+  },
+  {
+    "id": "helm-upgrade-operation-in-progress",
+    "error": "Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress",
+    "context": "Previous helm upgrade was interrupted by a network timeout. No other Helm operations are running. helm list shows status as pending-upgrade",
+    "must_contain": [
+      "helm.*rollback|helm.*history|--force|pending-install|pending-upgrade|secret.*helm"
+    ],
+    "must_not_suggest": [
+      "helm uninstall"
+    ]
+  },
+  {
+    "id": "compose-volume-data-lost",
+    "error": "Database is empty after running docker-compose down and docker-compose up",
+    "context": "PostgreSQL data was stored in a volume. Developer ran docker-compose down -v without realizing the -v flag removes named volumes. The volume was defined inline rather than as external",
+    "must_contain": [
+      "named.*volume|anonymous|docker-compose.*down.*-v|volumes.*key|external"
+    ],
+    "must_not_suggest": [
+      "backup"
+    ]
+  },
+  {
+    "id": "k8s-errimageneverpull",
+    "error": "Failed to pull image \"myapp:latest\": rpc error: code = Unknown desc = ErrImageNeverPull",
+    "context": "Using a local Kubernetes cluster (minikube) for development. Image was built with docker build but the pod spec has imagePullPolicy: Never and the image is not available inside minikube's Docker daemon",
+    "must_contain": [
+      "imagePullPolicy.*Never|minikube|kind|local.*image|docker.*build|load.*image"
+    ],
+    "must_not_suggest": [
+      "change to Always"
+    ]
+  },
+  {
+    "id": "terraform-plan-drift-every-run",
+    "error": "Terraform plan shows 3 resources to update with no configuration changes",
+    "context": "terraform plan always shows changes to default_tags on AWS resources and a timestamp field on a null_resource. No actual code changes were made between runs",
+    "must_contain": [
+      "ignore_changes|lifecycle|default_tags|timestamp|random|data source|external"
+    ],
+    "must_not_suggest": [
+      "terraform apply"
+    ]
+  },
+  {
+    "id": "docker-container-exits-code-0",
+    "error": "Container exits immediately with status code 0",
+    "context": "Dockerfile CMD runs a script that starts nginx in daemon mode. Container starts, nginx daemonizes to background, script finishes, container exits with 0",
+    "must_contain": [
+      "foreground|daemon|CMD|ENTRYPOINT|exec|tail -f|tty|stdin"
+    ],
+    "must_not_suggest": [
+      "check logs"
+    ]
+  },
+  {
+    "id": "k8s-ingress-404-portforward-works",
+    "error": "default backend - 404",
+    "context": "Kubernetes Ingress returns 404 for all paths. kubectl port-forward to the service works perfectly. The Ingress resource does not specify ingressClassName and the cluster has multiple ingress controllers installed",
+    "must_contain": [
+      "ingress class|ingressClassName|annotation|path.*type|pathType|Prefix|Exact|rewrite"
+    ],
+    "must_not_suggest": [
+      "check service"
+    ]
+  },
+  {
+    "id": "terraform-destroy-hangs-resource",
+    "error": "Still destroying... [id=vpc-0abc123, 10m elapsed]",
+    "context": "terraform destroy hangs on a VPC resource because there are manually-created ENIs and security groups inside the VPC that Terraform does not manage",
+    "must_contain": [
+      "target|depends_on|timeout|state rm|import|manual.*delete|lifecycle"
+    ],
+    "must_not_suggest": [
+      "kill terraform"
+    ]
+  },
+  {
+    "id": "docker-multistage-cache-miss",
+    "error": "Docker multi-stage build takes 8 minutes every time even when only application code changed",
+    "context": "Dockerfile copies entire project directory before running npm install. Every code change invalidates the npm install layer cache because COPY . . comes before RUN npm install",
+    "must_contain": [
+      "COPY.*order|package.json.*before|layer.*cache|.dockerignore|dependency.*first"
+    ],
+    "must_not_suggest": [
+      "--no-cache"
+    ]
+  },
+  {
+    "id": "k8s-pod-no-external-internet",
+    "error": "curl: (7) Failed to connect to api.github.com port 443: Network is unreachable",
+    "context": "Pod can reach other pods and services within the cluster. External internet access fails. The cluster uses Calico CNI and a NetworkPolicy with default-deny egress was applied to the namespace",
+    "must_contain": [
+      "NAT|egress|network policy|iptables|calico|cilium|masquerade"
+    ],
+    "must_not_suggest": [
+      "restart pod"
+    ]
+  },
+  {
+    "id": "k8s-cluster-auth-expired",
+    "error": "error: You must be logged in to the server (the server has asked for the client to provide credentials)",
+    "context": "kubectl was working yesterday. Using EKS cluster with IAM authentication. The AWS SSO session token expired overnight",
+    "must_contain": [
+      "token.*expired|kubeconfig|aws eks|gcloud|az aks|refresh|get-credentials"
+    ],
+    "must_not_suggest": [
+      "recreate cluster"
+    ]
+  },
+  {
+    "id": "compose-service-name-resolution-fails",
+    "error": "getaddrinfo ENOTFOUND backend",
+    "context": "Docker compose with frontend and backend services. Frontend tries to connect to http://backend:3000 but gets ENOTFOUND. Services are defined in separate docker-compose files run with separate docker compose up commands",
+    "must_contain": [
+      "network|default.*network|docker-compose.*network|links|depends_on|same.*network"
+    ],
+    "must_not_suggest": [
+      "use IP address"
+    ]
+  },
+  {
+    "id": "terraform-state-resource-missing-cloud",
+    "error": "Terraform state contains aws_instance.web but the EC2 instance does not exist in AWS console",
+    "context": "Someone manually terminated the EC2 instance via AWS console. Terraform state still tracks it. Next terraform plan will fail trying to read the resource attributes",
+    "must_contain": [
+      "terraform state rm|import|refresh|state.*drift|data.*source|moved"
+    ],
+    "must_not_suggest": [
+      "terraform apply"
+    ]
+  },
+  {
+    "id": "docker-multistage-copy-from-fails",
+    "error": "COPY failed: stat /var/lib/docker/overlay2/.../merged/app/build: file does not exist",
+    "context": "Multi-stage Dockerfile where COPY --from=builder /app/build ./build fails. The builder stage compiles to /app/dist instead of /app/build due to a recent config change",
+    "must_contain": [
+      "--from|stage.*name|AS|build.*stage|target|COPY --from=builder"
+    ],
+    "must_not_suggest": [
+      "single stage"
+    ]
+  },
+  {
+    "id": "python-cv2-module-not-found-after-pip-install",
+    "error": "ModuleNotFoundError: No module named 'cv2'",
+    "context": "pip install opencv-python completed successfully but import cv2 still fails in a headless Linux server (Docker container with slim base image)",
+    "must_contain": [
+      "opencv-python-headless|libGL|apt.*install|libglib|system.*dependency"
+    ],
+    "must_not_suggest": [
+      "pip install cv2"
+    ]
+  },
+  {
+    "id": "psycopg2-remaining-connection-slots-reserved",
+    "error": "psycopg2.OperationalError: FATAL:  remaining connection slots are reserved for non-replication superuser connections",
+    "context": "Django application in production with 4 Gunicorn workers, each opening its own connections to PostgreSQL with max_connections=100",
+    "must_contain": [
+      "superuser_reserved_connections|pgbouncer|connection pool|max_connections|idle"
+    ],
+    "must_not_suggest": [
+      "increase max_connections"
+    ]
+  },
+  {
+    "id": "sqlalchemy-queuepool-limit-reached",
+    "error": "sqlalchemy.exc.TimeoutError: QueuePool limit of size 5 overflow 10 reached, connection timed out, timeout 30.00",
+    "context": "FastAPI application with async endpoints using SQLAlchemy synchronous engine, connections not being returned to pool under load",
+    "must_contain": [
+      "pool_size|max_overflow|pool_recycle|pool_pre_ping|create_engine|NullPool"
+    ],
+    "must_not_suggest": [
+      "increase pool_size only"
+    ]
+  },
+  {
+    "id": "pandas-settingwithcopywarning-chained-assignment",
+    "error": "SettingWithCopyWarning: A value is trying to be set on a copy of a slice from a DataFrame",
+    "context": "Filtering a DataFrame with df[df['col'] > 5]['other_col'] = value, the assignment silently does nothing on the original DataFrame",
+    "must_contain": [
+      ".loc|.copy\\(\\)|chained.*indexing|view.*copy|SettingWithCopy"
+    ],
+    "must_not_suggest": [
+      "pd.options.*mode.*chained_assignment.*None"
+    ]
+  },
+  {
+    "id": "python-unicode-decode-error-csv-bom",
+    "error": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte",
+    "context": "Reading a CSV file exported from Excel that opens fine in Excel but fails with pandas.read_csv() using default encoding",
+    "must_contain": [
+      "encoding|latin-1|cp1252|chardet|detect|errors.*ignore|utf-16|BOM"
+    ],
+    "must_not_suggest": [
+      "errors.*replace"
+    ]
+  },
+  {
+    "id": "sqlalchemy-recursion-error-relationship-circular",
+    "error": "RecursionError: maximum recursion depth exceeded while calling a Python object",
+    "context": "SQLAlchemy models with bidirectional relationships between User and Post, accessing user.posts triggers infinite recursion during serialization",
+    "must_contain": [
+      "backref|back_populates|lazy|relationship|circular|selectinload|joinedload"
+    ],
+    "must_not_suggest": [
+      "sys.setrecursionlimit"
+    ]
+  },
+  {
+    "id": "postgresql-deadlock-detected-django-select-for-update",
+    "error": "ERROR:  deadlock detected\nDETAIL:  Process 12345 waits for ShareLock on transaction 67890; blocked by process 12346.",
+    "context": "Django application using select_for_update() on multiple rows in a transaction, deadlocks happen frequently under concurrent requests",
+    "must_contain": [
+      "ordering|order.*by|consistent.*order|nowait|skip_locked|lock.*order"
+    ],
+    "must_not_suggest": [
+      "retry only"
+    ]
+  },
+  {
+    "id": "redis-wrongtype-operation-key-type-mismatch",
+    "error": "WRONGTYPE Operation against a key holding the wrong kind of value",
+    "context": "Application uses GET on a key that was previously set with HSET, code was refactored to use strings instead of hashes but old keys remain in Redis",
+    "must_contain": [
+      "TYPE|key.*type|overwrite|DEL|different.*data.*structure|hash.*string"
+    ],
+    "must_not_suggest": [
+      "flush"
+    ]
+  },
+  {
+    "id": "mongodb-e11000-duplicate-key-id-different-documents",
+    "error": "E11000 duplicate key error collection: mydb.mycollection index: _id_ dup key: { _id: ObjectId('507f1f77bcf86cd799439011') }",
+    "context": "Documents being inserted are clearly different but duplicate _id errors appear sporadically, especially after network timeouts or retries",
+    "must_contain": [
+      "ObjectId|_id.*generation|retry|write concern|network|duplicate.*retry"
+    ],
+    "must_not_suggest": [
+      "dropIndex"
+    ]
+  },
+  {
+    "id": "python-libcuda-not-found-docker",
+    "error": "ImportError: libcuda.so.1: cannot open shared object file: No such file or directory",
+    "context": "Running a PyTorch model inside a Docker container that was built with CUDA support, works on the build machine but fails on deployment",
+    "must_contain": [
+      "nvidia.*runtime|--gpus|CUDA|nvidia-docker|base.*image|runtime.*nvidia"
+    ],
+    "must_not_suggest": [
+      "install cuda"
+    ]
+  },
+  {
+    "id": "postgresql-serialization-failure-read-write-dependency",
+    "error": "ERROR:  could not serialize access due to read/write dependencies among transactions",
+    "context": "PostgreSQL database using SERIALIZABLE isolation level for financial transactions, error occurs intermittently under concurrent load",
+    "must_contain": [
+      "serializable|isolation.*level|read committed|repeatable read|retry|conflict"
+    ],
+    "must_not_suggest": [
+      "lower isolation"
+    ]
+  },
+  {
+    "id": "python-multiprocessing-bootstrap-phase-error",
+    "error": "RuntimeError: An attempt has been made to start a new process before the current process has finished its bootstrapping phase.",
+    "context": "Python script using multiprocessing.Pool works on Linux but crashes on Windows or macOS, process creation fails at import time",
+    "must_contain": [
+      "if __name__|__main__|freeze_support|spawn|fork|set_start_method"
+    ],
+    "must_not_suggest": [
+      "use threading"
+    ]
+  },
+  {
+    "id": "elasticsearch-circuit-breaking-data-too-large",
+    "error": "circuit_breaking_exception: [parent] Data too large, data for [<http_request>] would be [15687654400/14.6gb], which is larger than the limit of [14440882380/13.4gb]",
+    "context": "Elasticsearch cluster with 16GB heap, aggregation queries on text fields causing fielddata to explode, cluster goes into repeated circuit breaker trips",
+    "must_contain": [
+      "indices.breaker|fielddata|cache.*clear|mapping|doc_values|text.*keyword"
+    ],
+    "must_not_suggest": [
+      "increase heap"
+    ]
+  },
+  {
+    "id": "mysql-lock-wait-timeout-exceeded",
+    "error": "ERROR 1205 (HY000): Lock wait timeout exceeded; try restarting transaction",
+    "context": "MySQL InnoDB table with frequent updates, a long-running reporting query holds locks that block write transactions",
+    "must_contain": [
+      "innodb_lock_wait_timeout|SHOW ENGINE INNODB STATUS|blocking.*query|PROCESSLIST|information_schema.*innodb_trx"
+    ],
+    "must_not_suggest": [
+      "increase timeout only"
+    ]
+  },
+  {
+    "id": "python-asyncio-event-loop-closed-windows",
+    "error": "RuntimeError: Event loop is closed",
+    "context": "aiohttp client session making multiple requests on Windows, error appears after all requests complete successfully during cleanup/garbage collection",
+    "must_contain": [
+      "WindowsSelectorEventLoopPolicy|ProactorEventLoop|set_event_loop_policy|SelectorEventLoop"
+    ],
+    "must_not_suggest": [
+      "asyncio.run"
+    ]
+  },
+  {
+    "id": "postgresql-slow-query-ignoring-existing-index",
+    "error": "Seq Scan on large_table  (cost=0.00..185432.00 rows=5000000 width=64) (actual time=0.021..4523.109 rows=5000000 loops=1)",
+    "context": "PostgreSQL query runs a sequential scan on a 50M row table despite a btree index existing on the WHERE clause column, EXPLAIN shows the index is not used",
+    "must_contain": [
+      "ANALYZE|EXPLAIN|vacuum|statistics|cost|seq_scan|enable_seqscan|random_page_cost"
+    ],
+    "must_not_suggest": [
+      "create another index"
+    ]
+  },
+  {
+    "id": "python-pip-resolution-impossible-conflicting-deps",
+    "error": "ERROR: Cannot install package-a==2.0 and package-b==3.1 because these package versions have conflicting dependencies. ResolutionImpossible",
+    "context": "Two core project dependencies each require a different major version of a shared transitive dependency, pip cannot find a valid resolution",
+    "must_contain": [
+      "constraint|pip-compile|pip-tools|resolution|compatible.*version|override"
+    ],
+    "must_not_suggest": [
+      "--force-reinstall"
+    ]
+  },
+  {
+    "id": "sqlite-database-locked-web-concurrent",
+    "error": "sqlite3.OperationalError: database is locked",
+    "context": "Flask web application using SQLite as its database, error appears under moderate concurrent request load with multiple writes happening simultaneously",
+    "must_contain": [
+      "WAL|journal_mode|timeout|busy_timeout|PostgreSQL|connection.*per.*thread"
+    ],
+    "must_not_suggest": [
+      "retry"
+    ]
+  },
+  {
+    "id": "celery-received-unregistered-task",
+    "error": "Received unregistered task of type 'myapp.tasks.process_data'",
+    "context": "Celery worker starts without errors and task module is importable from Python shell, but worker does not recognize the task when a message arrives from the broker",
+    "must_contain": [
+      "autodiscover|include|CELERY_IMPORTS|task.*name|app.*config|register"
+    ],
+    "must_not_suggest": [
+      "restart worker only"
+    ]
+  },
+  {
+    "id": "postgresql-out-of-shared-memory-create-index-concurrently",
+    "error": "ERROR:  out of shared memory\nHINT:  You might need to increase max_locks_per_transaction.",
+    "context": "Running CREATE INDEX CONCURRENTLY on a partitioned table with 500+ partitions, each partition acquires a separate lock",
+    "must_contain": [
+      "max_locks_per_transaction|max_pred_locks|shared_buffers|concurrent.*index|partitions"
+    ],
+    "must_not_suggest": [
+      "increase shared_buffers"
+    ]
+  },
+  {
+    "id": "python-winerror32-file-in-use-tempfile",
+    "error": "PermissionError: [WinError 32] The process cannot access the file because it is being used by another process",
+    "context": "Python script on Windows creates a NamedTemporaryFile, writes data, then tries to read it from another function, fails because the file handle is still open",
+    "must_contain": [
+      "context manager|with.*open|close|tempfile|NamedTemporaryFile|delete.*False"
+    ],
+    "must_not_suggest": [
+      "administrator"
+    ]
+  },
+  {
+    "id": "mongodb-slow-query-compound-index-not-used",
+    "error": "COLLSCAN detected in slow query log: { status: 'active', createdAt: { $gte: ISODate('2024-01-01') }, category: 'premium' }",
+    "context": "MongoDB query filters on status, sorts by createdAt, and filters on category. A compound index {category: 1, status: 1, createdAt: 1} exists but is not being used efficiently",
+    "must_contain": [
+      "index.*order|prefix|compound.*order|explain|ESR|equality.*sort.*range"
+    ],
+    "must_not_suggest": [
+      "create new index"
+    ]
+  },
+  {
+    "id": "redis-oom-but-maxmemory-not-reached",
+    "error": "OOM command not allowed when used memory > 'maxmemory'",
+    "context": "Redis INFO shows used_memory at 3.2GB with maxmemory set to 4GB, but OOM errors still occur. RSS memory is much higher than used_memory due to fragmentation",
+    "must_contain": [
+      "maxmemory-policy|allkeys-lru|volatile-lru|eviction|noeviction|used_memory_rss"
+    ],
+    "must_not_suggest": [
+      "increase maxmemory only"
+    ]
+  },
+  {
+    "id": "alembic-target-database-not-up-to-date-multiple-heads",
+    "error": "alembic.util.exc.CommandError: Target database is not up to date.",
+    "context": "All migrations have been applied with alembic upgrade head, but the error persists. Two developers merged branches that each added a migration, creating divergent heads",
+    "must_contain": [
+      "alembic_version|heads|merge|branch|stamp|current|multiple heads"
+    ],
+    "must_not_suggest": [
+      "alembic upgrade head"
+    ]
+  },
+  {
+    "id": "python-cannot-allocate-memory-subprocess-fork",
+    "error": "OSError: [Errno 12] Cannot allocate memory",
+    "context": "Python process using 8GB of RAM calls subprocess.Popen to run a small shell command, fails because fork() temporarily doubles memory requirements",
+    "must_contain": [
+      "vfork|posix_spawn|preexec_fn|overcommit|close_fds|fork.*double.*memory"
+    ],
+    "must_not_suggest": [
+      "add more RAM"
+    ]
+  },
+  {
+    "id": "git-rebase-phantom-conflict",
+    "error": "CONFLICT (content): Merge conflict in file.txt",
+    "context": "git rebase shows conflict but file hasn't been modified in either branch. Conflict is from a renamed file.",
+    "must_contain": [
+      "rename|git diff.*name-status|merge.*strategy|ours|theirs|rerere"
+    ],
+    "must_not_suggest": [
+      "just resolve manually"
+    ]
+  },
+  {
+    "id": "gh-actions-resource-not-accessible",
+    "error": "Resource not accessible by integration",
+    "context": "GitHub Actions workflow fails when trying to comment on a PR using GITHUB_TOKEN.",
+    "must_contain": [
+      "permissions|contents.*write|pull-requests.*write|issues.*write|workflow.*permissions"
+    ],
+    "must_not_suggest": [
+      "use PAT"
+    ]
+  },
+  {
+    "id": "lambda-vpc-timeout",
+    "error": "Task timed out after 15.00 seconds",
+    "context": "AWS Lambda in VPC times out. Function completes in 2s locally. Has internet access via NAT Gateway.",
+    "must_contain": [
+      "cold start|VPC|NAT gateway|ENI|security group|subnet|outbound"
+    ],
+    "must_not_suggest": [
+      "increase timeout"
+    ]
+  },
+  {
+    "id": "git-push-non-fast-forward",
+    "error": "! [rejected] main -> main (non-fast-forward)",
+    "context": "git push rejected but nobody else pushed. I rebased locally.",
+    "must_contain": [
+      "rebase|pull.*rebase|force-with-lease|fetch|remote.*tracking"
+    ],
+    "must_not_suggest": [
+      "force push"
+    ]
+  },
+  {
+    "id": "ecs-exit-code-137",
+    "error": "Essential container in task exited, exit code: 137",
+    "context": "AWS ECS Fargate task keeps stopping. Container memory limit is 512MiB.",
+    "must_contain": [
+      "memory.*hard.*limit|memory.*reservation|task.*definition|container.*memory|OOM"
+    ],
+    "must_not_suggest": [
+      "restart service"
+    ]
+  },
+  {
+    "id": "nginx-499-flood",
+    "error": "499 Client Closed Request",
+    "context": "Nginx access logs show thousands of 499 errors. Backend is slow under load.",
+    "must_contain": [
+      "proxy_read_timeout|upstream.*slow|keepalive|client.*disconnect|buffering"
+    ],
+    "must_not_suggest": [
+      "ignore"
+    ]
+  },
+  {
+    "id": "git-ssl-corporate",
+    "error": "SSL certificate problem: unable to get local issuer certificate",
+    "context": "git clone fails on corporate laptop behind proxy. Browser works fine.",
+    "must_contain": [
+      "GIT_SSL_CAINFO|GIT_SSL_CAPATH|ca-certificates|update-ca-certificates|corporate.*proxy"
+    ],
+    "must_not_suggest": [
+      "GIT_SSL_NO_VERIFY"
+    ]
+  },
+  {
+    "id": "s3-slowdown",
+    "error": "SlowDown: Please reduce your request rate",
+    "context": "S3 returns 503 SlowDown during batch processing of 10k files per second.",
+    "must_contain": [
+      "prefix|partition|key.*design|retry.*exponential|CloudFront|hash|randomize"
+    ],
+    "must_not_suggest": [
+      "just retry"
+    ]
+  },
+  {
+    "id": "gh-actions-exit-code-2",
+    "error": "Error: Process completed with exit code 2",
+    "context": "GitHub Actions step fails with exit code 2 but no error output visible.",
+    "must_contain": [
+      "set -e|pipefail|stderr|2>&1|exit code|script|shell.*bash"
+    ],
+    "must_not_suggest": [
+      "rerun"
+    ]
+  },
+  {
+    "id": "rds-too-many-connections",
+    "error": "FATAL: too many connections for role",
+    "context": "AWS RDS PostgreSQL. max_connections is 200. App has 5 instances with pool_size=10 each.",
+    "must_contain": [
+      "SSL.*handshake|connection.*overhead|RDS Proxy|pgbouncer|pool.*size.*total"
+    ],
+    "must_not_suggest": [
+      "increase max_connections"
+    ]
+  },
+  {
+    "id": "git-diff-phantom-changes",
+    "error": "modified: file.txt",
+    "context": "git status shows modified files but git diff shows no content changes.",
+    "must_contain": [
+      "line ending|CRLF|autocrlf|eol|.gitattributes|core.autocrlf"
+    ],
+    "must_not_suggest": [
+      "git checkout"
+    ]
+  },
+  {
+    "id": "cloudformation-rollback-failed",
+    "error": "UPDATE_ROLLBACK_FAILED",
+    "context": "CloudFormation stack stuck in UPDATE_ROLLBACK_FAILED state.",
+    "must_contain": [
+      "ContinueUpdateRollback|skip.*resources|resources-to-skip|manual.*fix|stack.*state"
+    ],
+    "must_not_suggest": [
+      "delete stack"
+    ]
+  },
+  {
+    "id": "letsencrypt-rate-limit",
+    "error": "too many certificates already issued for exact set of domains",
+    "context": "Let's Encrypt renewal fails. Production site SSL is expiring in 2 days.",
+    "must_contain": [
+      "rate limit|staging|duplicate.*certificate|renewal|--staging|50 per week"
+    ],
+    "must_not_suggest": [
+      "wait 7 days"
+    ]
+  },
+  {
+    "id": "serverless-function-too-large",
+    "error": "Function size too large: 262144000 bytes",
+    "context": "Vercel serverless function exceeds 250MB limit. The function code is only 50 lines.",
+    "must_contain": [
+      "bundle|tree.*shaking|external|serverless|exclude|dependency|esbuild|nft"
+    ],
+    "must_not_suggest": [
+      "increase limit"
+    ]
+  },
+  {
+    "id": "api-gateway-malformed-response",
+    "error": "Execution failed due to configuration error: Malformed Lambda proxy response",
+    "context": "AWS API Gateway returns 502 but Lambda logs show successful execution.",
+    "must_contain": [
+      "statusCode|headers|body|JSON.stringify|response.*format|isBase64Encoded"
+    ],
+    "must_not_suggest": [
+      "check Lambda code only"
+    ]
+  },
+  {
+    "id": "git-blame-wrong-author",
+    "error": "git blame shows wrong author for all lines in a file",
+    "context": "After a code formatting commit, git blame shows the formatter bot as author for every line.",
+    "must_contain": [
+      "ignore-rev|ignore-revs-file|.git-blame-ignore-revs|--ignore-rev"
+    ],
+    "must_not_suggest": [
+      "recommit"
+    ]
+  },
+  {
+    "id": "ssh-host-key-changed",
+    "error": "WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED",
+    "context": "SSH warns about changed host key after redeploying a cloud VM with same IP.",
+    "must_contain": [
+      "known_hosts|host key|ssh-keygen.*-R|fingerprint|IP.*changed|cloud.*instance"
+    ],
+    "must_not_suggest": [
+      "blindly remove"
+    ]
+  },
+  {
+    "id": "lambda-edge-body-error",
+    "error": "The body is not a string, is not a Buffer, and is not a ReadableStream",
+    "context": "Lambda@Edge function modifying CloudFront response fails.",
+    "must_contain": [
+      "response.*body|base64|encoding|Buffer|toString|cf.*response|origin.*response"
+    ],
+    "must_not_suggest": [
+      "just stringify"
+    ]
+  },
+  {
+    "id": "gh-actions-os-specific-fail",
+    "error": "Error: Process completed with exit code 1",
+    "context": "GitHub Actions matrix job fails on windows-latest but passes on ubuntu-latest. Same code.",
+    "must_contain": [
+      "path separator|line ending|case sensitive|env.*variable|temp.*dir|OS.*specific"
+    ],
+    "must_not_suggest": [
+      "retry"
+    ]
+  },
+  {
+    "id": "iam-assume-role-denied",
+    "error": "User: arn:aws:iam::123:user/deploy is not authorized to perform: sts:AssumeRole",
+    "context": "Cross-account IAM role assumption fails. The role and user policies look correct.",
+    "must_contain": [
+      "trust policy|trust relationship|principal|arn|condition|external-id"
+    ],
+    "must_not_suggest": [
+      "add admin policy"
+    ]
+  },
+  {
+    "id": "git-submodule-not-a-tree",
+    "error": "fatal: reference is not a tree: abc123",
+    "context": "git submodule update --init fails. The submodule was updated by a teammate.",
+    "must_contain": [
+      "submodule.*update|git submodule|commit.*not.*pushed|superproject|recorded.*commit"
+    ],
+    "must_not_suggest": [
+      "delete submodule"
+    ]
+  },
+  {
+    "id": "nginx-413-ignored-config",
+    "error": "413 Request Entity Too Large",
+    "context": "Nginx returns 413 but client_max_body_size 100M is set. Using Kubernetes Ingress.",
+    "must_contain": [
+      "http.*server.*location|multiple.*blocks|proxy_pass|upstream|ingress|annotation"
+    ],
+    "must_not_suggest": [
+      "increase more"
+    ]
+  },
+  {
+    "id": "cloudwatch-log-group-missing",
+    "error": "An error occurred (ResourceNotFoundException): The specified log group does not exist",
+    "context": "Lambda was working yesterday. Now CloudWatch logs are gone and Lambda can't create them.",
+    "must_contain": [
+      "IAM|CreateLogGroup|logs:CreateLogGroup|logs:PutLogEvents|execution role"
+    ],
+    "must_not_suggest": [
+      "create manually"
+    ]
+  },
+  {
+    "id": "dependabot-pr-recreated",
+    "error": "Dependabot PR keeps getting recreated after merge",
+    "context": "Every time we merge a Dependabot PR, it creates the same one again next day.",
+    "must_contain": [
+      "base branch|default branch|rebase|automerge|schedule|ignore|grouping"
+    ],
+    "must_not_suggest": [
+      "disable bot"
+    ]
+  },
+  {
+    "id": "csp-inline-script-blocked",
+    "error": "Refused to execute inline script because it violates the following Content Security Policy directive: script-src",
+    "context": "CSP blocks inline scripts on our page. We need inline scripts for analytics.",
+    "must_contain": [
+      "nonce|hash|unsafe-inline|script-src|strict-dynamic|sha256"
+    ],
+    "must_not_suggest": [
+      "unsafe-inline everywhere"
+    ]
+  }
+]

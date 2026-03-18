@@ -1,0 +1,242 @@
+[
+  {
+    "id": "node-eacces",
+    "stack": "node",
+    "error_message": "npm ERR! Error: EACCES: permission denied, access '/usr/local/lib/node_modules'",
+    "context": "I ran npm install -g typescript and got this error.",
+    "ground_truth": {
+      "root_cause": "npm tries to write to a directory owned by root",
+      "correct_fix": "change npm prefix to user directory or use nvm",
+      "anti_pattern": "do not use sudo npm install -g",
+      "keywords": ["prefix", "nvm", "chown", "npm-global"]
+    }
+  },
+  {
+    "id": "node-heap-oom",
+    "stack": "node",
+    "error_message": "FATAL ERROR: CALL_AND_RETRY_LAST Allocation failed - JavaScript heap out of memory",
+    "context": "My Next.js build crashes with this error on CI.",
+    "ground_truth": {
+      "root_cause": "Node.js default memory limit exceeded during build",
+      "correct_fix": "increase memory with --max-old-space-size",
+      "anti_pattern": "do not just keep increasing memory without investigating the leak",
+      "keywords": ["max-old-space-size", "NODE_OPTIONS", "memory", "heap"]
+    }
+  },
+  {
+    "id": "node-openssl",
+    "stack": "node",
+    "error_message": "error:0308010C:digital envelope routines::unsupported",
+    "context": "After upgrading to Node 18 my webpack build fails with this.",
+    "ground_truth": {
+      "root_cause": "Node 17+ uses OpenSSL 3.0 which dropped support for some algorithms used by older webpack/tools",
+      "correct_fix": "upgrade webpack and dependencies, or set NODE_OPTIONS=--openssl-legacy-provider as temporary workaround",
+      "anti_pattern": "do not permanently rely on --openssl-legacy-provider, upgrade your tools instead",
+      "keywords": ["openssl", "legacy-provider", "NODE_OPTIONS", "webpack", "node 17", "node 18"]
+    }
+  },
+  {
+    "id": "docker-exec-format",
+    "stack": "docker",
+    "error_message": "exec format error",
+    "context": "I built a Docker image on my M1 Mac and it fails when deployed to our x86 Linux servers.",
+    "ground_truth": {
+      "root_cause": "image built for ARM architecture cannot run on x86/amd64",
+      "correct_fix": "build with --platform linux/amd64 or use docker buildx for multi-arch",
+      "anti_pattern": "do not just rebuild without specifying platform",
+      "keywords": ["platform", "amd64", "arm64", "buildx", "multi-arch", "M1", "Apple Silicon"]
+    }
+  },
+  {
+    "id": "k8s-crashloop",
+    "stack": "kubernetes",
+    "error_message": "CrashLoopBackOff",
+    "context": "My pod keeps restarting and shows CrashLoopBackOff status.",
+    "ground_truth": {
+      "root_cause": "container process exits with non-zero code, Kubernetes restarts with exponential backoff",
+      "correct_fix": "check logs with kubectl logs --previous, check exit code with kubectl describe pod",
+      "anti_pattern": "do not just delete the pod, deployment will recreate with same crash",
+      "keywords": ["kubectl logs", "--previous", "describe pod", "exit code", "restart"]
+    }
+  },
+  {
+    "id": "k8s-oomkilled",
+    "stack": "kubernetes",
+    "error_message": "OOMKilled",
+    "context": "My Java app pod keeps getting OOMKilled after running for a few hours.",
+    "ground_truth": {
+      "root_cause": "container exceeded its memory limit, killed by the OOM killer",
+      "correct_fix": "increase memory limits or fix memory leak, check with kubectl describe pod for last status",
+      "anti_pattern": "do not just increase limits without investigating the leak",
+      "keywords": ["memory limit", "resources", "limits", "describe pod", "OOM", "memory leak"]
+    }
+  },
+  {
+    "id": "git-divergent",
+    "stack": "git",
+    "error_message": "hint: You have divergent branches and need to specify how to reconcile them.",
+    "context": "I tried git pull and got this error. Never seen it before.",
+    "ground_truth": {
+      "root_cause": "git 2.27+ requires explicit merge strategy when local and remote branches diverge",
+      "correct_fix": "set pull strategy: git config pull.rebase false (merge) or git config pull.rebase true (rebase)",
+      "anti_pattern": "do not just force push to resolve this",
+      "keywords": ["pull.rebase", "pull.ff", "merge", "rebase", "git config"]
+    }
+  },
+  {
+    "id": "git-publickey",
+    "stack": "git",
+    "error_message": "git@github.com: Permission denied (publickey). fatal: Could not read from remote repository.",
+    "context": "I cloned a repo fine yesterday but now git push fails with this.",
+    "ground_truth": {
+      "root_cause": "SSH agent does not have your key loaded, or key not added to GitHub",
+      "correct_fix": "run ssh-add, or check ~/.ssh/config, or add key to GitHub settings",
+      "anti_pattern": "do not generate a new key without checking if existing one is loaded",
+      "keywords": ["ssh-add", "ssh-agent", "ssh key", "GitHub SSH", "id_rsa", "id_ed25519"]
+    }
+  },
+  {
+    "id": "python-externally-managed",
+    "stack": "python",
+    "error_message": "error: externally-managed-environment",
+    "context": "I ran pip install requests on my new Ubuntu 24.04 and got this error.",
+    "ground_truth": {
+      "root_cause": "PEP 668 prevents pip from modifying system Python packages to avoid breaking the OS",
+      "correct_fix": "use a virtual environment (python -m venv) or pipx for CLI tools",
+      "anti_pattern": "do not use --break-system-packages flag",
+      "keywords": ["venv", "virtual environment", "PEP 668", "pipx", "system Python"]
+    }
+  },
+  {
+    "id": "react-hydration",
+    "stack": "react",
+    "error_message": "Hydration failed because the initial UI does not match what was rendered on the server.",
+    "context": "My Next.js page shows this error in the console. It only happens in production.",
+    "ground_truth": {
+      "root_cause": "server-rendered HTML differs from client-side render, usually due to browser-only APIs like window/localStorage or Date",
+      "correct_fix": "use useEffect for browser-only code, ensure initial render matches server output",
+      "anti_pattern": "do not add suppressHydrationWarning everywhere",
+      "keywords": ["useEffect", "useState", "window", "localStorage", "server", "client", "suppressHydrationWarning"]
+    }
+  },
+  {
+    "id": "react-too-many-renders",
+    "stack": "react",
+    "error_message": "Too many re-renders. React limits the number of renders to prevent an infinite loop.",
+    "context": "I added a state update in my component and now it crashes with this.",
+    "ground_truth": {
+      "root_cause": "setState called during render causes infinite re-render loop",
+      "correct_fix": "wrap state updates in event handlers or useEffect, do not call setState directly in component body",
+      "anti_pattern": "do not call setState unconditionally in render",
+      "keywords": ["useEffect", "event handler", "setState", "render", "infinite loop", "onClick"]
+    }
+  },
+  {
+    "id": "postgres-relation-not-exist",
+    "stack": "postgres",
+    "error_message": "ERROR: relation \"users\" does not exist",
+    "context": "I can see the table in pgAdmin but my app query fails with this error.",
+    "ground_truth": {
+      "root_cause": "wrong schema, wrong database, table name case sensitivity, or missing search_path",
+      "correct_fix": "check current database and schema, use schema-qualified name, or set search_path",
+      "anti_pattern": "do not create the table again without checking which database you are connected to",
+      "keywords": ["schema", "search_path", "database", "case sensitive", "double quotes", "public"]
+    }
+  },
+  {
+    "id": "postgres-too-many-connections",
+    "stack": "postgres",
+    "error_message": "FATAL: too many connections for role \"myapp\"",
+    "context": "My app works fine locally but in production during peak traffic I get this.",
+    "ground_truth": {
+      "root_cause": "app opens more connections than max_connections allows, usually missing connection pooling",
+      "correct_fix": "use a connection pooler like PgBouncer, or configure pool size in your ORM",
+      "anti_pattern": "do not just increase max_connections, each connection uses ~10MB RAM",
+      "keywords": ["PgBouncer", "connection pool", "max_connections", "pool size", "pgpool"]
+    }
+  },
+  {
+    "id": "docker-no-space",
+    "stack": "docker",
+    "error_message": "no space left on device",
+    "context": "Docker build fails with this but my disk still has 50GB free.",
+    "ground_truth": {
+      "root_cause": "Docker's storage area is full with old images, containers, and build cache, separate from host disk",
+      "correct_fix": "run docker system prune to clean up unused resources",
+      "anti_pattern": "do not just delete random files from the host filesystem",
+      "keywords": ["docker system prune", "docker image prune", "build cache", "volumes", "overlay2"]
+    }
+  },
+  {
+    "id": "ts-type-not-assignable",
+    "stack": "typescript",
+    "error_message": "Type 'string | undefined' is not assignable to type 'string'. Type 'undefined' is not assignable to type 'string'.",
+    "context": "I'm passing a value from an optional field to a function that requires a string.",
+    "ground_truth": {
+      "root_cause": "TypeScript strict null checks detect that the value could be undefined",
+      "correct_fix": "add null check, use nullish coalescing (??), or non-null assertion (!) if certain",
+      "anti_pattern": "do not disable strictNullChecks to fix this",
+      "keywords": ["null check", "undefined", "optional", "??", "non-null assertion", "strictNullChecks"]
+    }
+  },
+  {
+    "id": "nginx-502",
+    "stack": "nginx",
+    "error_message": "502 Bad Gateway",
+    "context": "My nginx reverse proxy returns 502 when trying to reach my Node.js backend.",
+    "ground_truth": {
+      "root_cause": "nginx cannot connect to the upstream backend, either it is down, wrong port, or wrong address",
+      "correct_fix": "check if backend is running, verify proxy_pass address and port, check nginx error log",
+      "anti_pattern": "do not just restart nginx without checking if the backend is actually running",
+      "keywords": ["proxy_pass", "upstream", "backend", "error.log", "port", "127.0.0.1"]
+    }
+  },
+  {
+    "id": "npm-eresolve",
+    "stack": "npm",
+    "error_message": "npm ERR! ERESOLVE unable to resolve dependency tree",
+    "context": "I can't install dependencies after adding a new package.",
+    "ground_truth": {
+      "root_cause": "peer dependency conflict between packages requiring different versions",
+      "correct_fix": "check which packages conflict, try --legacy-peer-deps, or update conflicting packages",
+      "anti_pattern": "do not use --force as first resort, it can install incompatible versions",
+      "keywords": ["peer dependency", "--legacy-peer-deps", "conflict", "peer dep", "npm ERR"]
+    }
+  },
+  {
+    "id": "linux-too-many-open-files",
+    "stack": "linux",
+    "error_message": "Too many open files",
+    "context": "My Node.js server crashes with this after running for a day in production.",
+    "ground_truth": {
+      "root_cause": "process exceeded the file descriptor limit (ulimit), usually due to a file descriptor leak",
+      "correct_fix": "increase ulimit and fix the leak, check with lsof or /proc/pid/fd",
+      "anti_pattern": "do not just increase ulimit without investigating the leak",
+      "keywords": ["ulimit", "file descriptor", "lsof", "/proc", "nofile", "fd leak"]
+    }
+  },
+  {
+    "id": "aws-access-denied",
+    "stack": "aws",
+    "error_message": "An error occurred (AccessDenied) when calling the PutObject operation: Access Denied",
+    "context": "My Lambda function can't write to S3 even though I attached the S3 policy.",
+    "ground_truth": {
+      "root_cause": "IAM policy missing, wrong resource ARN, bucket policy blocking, or wrong execution role",
+      "correct_fix": "check IAM policy resource ARN matches the bucket, check bucket policy, verify the Lambda execution role",
+      "anti_pattern": "do not attach AdministratorAccess to fix this",
+      "keywords": ["IAM", "bucket policy", "execution role", "ARN", "s3:PutObject", "resource"]
+    }
+  },
+  {
+    "id": "rust-borrow-moved",
+    "stack": "rust",
+    "error_message": "borrow of moved value: `x`",
+    "context": "I passed a String to a function and then tried to use it again.",
+    "ground_truth": {
+      "root_cause": "Rust ownership: passing a value to a function moves it, original variable is no longer valid",
+      "correct_fix": "clone the value, pass a reference (&x), or restructure to avoid the move",
+      "anti_pattern": "do not just clone everything, understand when to use references",
+      "keywords": ["ownership", "move", "clone", "borrow", "reference", "&"]
+    }
+  }
+]

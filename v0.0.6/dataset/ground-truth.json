@@ -1,0 +1,182 @@
+[
+  {
+    "id": "so-docker-econnrefused-postgres",
+    "error": "ECONNREFUSED for Postgres on nodeJS with Docker",
+    "context": "Node app in Docker can't connect to Postgres container. Using 127.0.0.1 in DATABASE_URL.",
+    "must_contain": ["service name|container name|docker-compose|localhost.*wrong|not.*127\\.0\\.0\\.1"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/33357567",
+    "covered": true
+  },
+  {
+    "id": "so-docker-http-between-containers",
+    "error": "Docker HTTP-requests between containers fail",
+    "context": "Container A can't reach container B. Using host port (10010) instead of container port (9000) in URL.",
+    "must_contain": ["container port|host port|internal port|9000|service name"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/39046413",
+    "covered": true
+  },
+  {
+    "id": "so-python-relative-imports",
+    "error": "Relative imports in Python 3: ImportError attempted relative import with no known parent package",
+    "context": "Running python mypackage/mymodule.py directly fails with relative import error.",
+    "must_contain": ["-m|python -m|__init__|package|sys\\.path"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/16981921",
+    "covered": true
+  },
+  {
+    "id": "so-python-matplotlib-agg-backend",
+    "error": "UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure",
+    "context": "plt.show() does nothing on Linux. Using matplotlib in PyCharm.",
+    "must_contain": ["tkinter|python3-tk|apt.*install.*tk|TkAgg|matplotlib\\.use"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/56656777",
+    "covered": true
+  },
+  {
+    "id": "so-python-aiohttp-ssl-proxy",
+    "error": "aiohttp ClientConnectorError: Cannot connect to host ssl:default",
+    "context": "aiohttp can't connect on PythonAnywhere. Regular requests library works.",
+    "must_contain": ["trust_env|proxy|aiohttp.*trust|HTTPS_PROXY"],
+    "must_not_suggest": ["ssl.*False|verify.*False"],
+    "source": "https://stackoverflow.com/questions/63347818",
+    "covered": true
+  },
+  {
+    "id": "so-node-cors-options-preflight",
+    "error": "CORS headers on OPTIONS route don't allow browsers to access API",
+    "context": "Added CORS headers to Express routes but POST requests still fail. GET works.",
+    "must_contain": ["preflight|OPTIONS|Content-Type|application/json|cors.*middleware|app\\.use.*cors"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/7067966",
+    "covered": true
+  },
+  {
+    "id": "so-node-cors-wildcard-credentials",
+    "error": "CORS: Cannot use wildcard in Access-Control-Allow-Origin when credentials flag is true",
+    "context": "Using withCredentials: true in fetch but server returns Access-Control-Allow-Origin: *.",
+    "must_contain": ["specific origin|exact.*origin|not.*\\*|withCredentials|credentials|origin.*header"],
+    "must_not_suggest": ["\\*"],
+    "source": "https://stackoverflow.com/questions/19743396",
+    "covered": true
+  },
+  {
+    "id": "so-git-merge-into-feature",
+    "error": "How to merge master/hotfix branch into feature branch",
+    "context": "Need to get latest master changes into my feature branch without messing up history.",
+    "must_contain": ["git checkout feature|git merge master|git rebase master|merge|rebase"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/16955980",
+    "covered": true
+  },
+  {
+    "id": "so-git-push-authentication-failed",
+    "error": "Git push results in Authentication Failed",
+    "context": "git push fails with 403 after enabling two-factor authentication on GitHub.",
+    "must_contain": ["personal access token|PAT|token|two-factor|2FA|credential"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/17659206",
+    "covered": true
+  },
+  {
+    "id": "so-docker-permission-denied",
+    "error": "Docker: Got permission denied while trying to connect to the Docker daemon socket",
+    "context": "docker commands fail with permission denied for non-root user on Linux.",
+    "must_contain": ["usermod.*docker|docker group|groupadd|newgrp|sudo usermod"],
+    "must_not_suggest": ["chmod.*sock"],
+    "source": "https://stackoverflow.com/questions/48957195",
+    "covered": true
+  },
+  {
+    "id": "so-java-avoid-null-checks",
+    "error": "NullPointerException: how to avoid checking for nulls in Java",
+    "context": "Code has null checks everywhere. Looking for better patterns.",
+    "must_contain": ["Optional|@NotNull|@Nullable|Null Object|Objects\\.requireNonNull|contract"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/271526",
+    "covered": false
+  },
+  {
+    "id": "so-java-null-instanceof",
+    "error": "Is null check needed before calling instanceof in Java?",
+    "context": "Want to know if (x instanceof Foo) crashes when x is null.",
+    "must_contain": ["false|null.*instanceof.*false|no.*null check|not needed|safe"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/2950319",
+    "covered": false
+  },
+  {
+    "id": "so-java-classnotfound-vs-noclassdef",
+    "error": "ClassNotFoundException vs NoClassDefFoundError in Java",
+    "context": "Getting ClassNotFoundException. Don't understand the difference from NoClassDefFoundError.",
+    "must_contain": ["classpath|Class\\.forName|loadClass|compile.*time|runtime|missing.*jar"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/1457863",
+    "covered": false
+  },
+  {
+    "id": "so-csharp-nullreferenceexception",
+    "error": "NullReferenceException: Object reference not set to an instance of an object in C#",
+    "context": "C# application throws NullReferenceException. Need to understand and fix it.",
+    "must_contain": ["null|initialize|new |debugger|breakpoint|stack trace|check.*null|\\?\\.|null.*conditional"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/4660142",
+    "covered": false
+  },
+  {
+    "id": "so-csharp-as-vs-cast",
+    "error": "Should I use 'as' instead of a cast in C# even without null check?",
+    "context": "C# code uses 'as' keyword for casting everywhere instead of direct cast.",
+    "must_contain": ["InvalidCastException|direct cast|null|as.*returns null|type safety"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/2139798",
+    "covered": false
+  },
+  {
+    "id": "so-flutter-dismiss-keyboard",
+    "error": "How to dismiss the on screen keyboard in Flutter",
+    "context": "Flutter app keyboard stays open after tapping outside text field.",
+    "must_contain": ["FocusManager|FocusScope|unfocus|primaryFocus|FocusNode"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/44991968",
+    "covered": false
+  },
+  {
+    "id": "so-php-json-decode-array",
+    "error": "json_decode returns object instead of array in PHP",
+    "context": "json_decode returns stdClass object. Need associative array.",
+    "must_contain": ["true|second.*parameter|second.*argument|json_decode.*true|assoc"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/5164404",
+    "covered": false
+  },
+  {
+    "id": "so-php-max-execution-time",
+    "error": "Fatal error: Maximum execution time of 30 seconds exceeded in PHP",
+    "context": "PHP script times out processing large dataset.",
+    "must_contain": ["max_execution_time|set_time_limit|ini_set|php\\.ini"],
+    "must_not_suggest": ["set_time_limit.*0.*everywhere"],
+    "source": "https://stackoverflow.com/questions/5164930",
+    "covered": false
+  },
+  {
+    "id": "so-ruby-full-backtrace",
+    "error": "Ruby prints truncated backtrace instead of full one",
+    "context": "Ruby exception shows only first few lines of backtrace. Need full stack trace.",
+    "must_contain": ["backtrace|exception\\.backtrace|rescue|reraise|puts.*backtrace"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/376513",
+    "covered": false
+  },
+  {
+    "id": "so-swift-hide-view-dynamically",
+    "error": "Dynamically hiding view in SwiftUI",
+    "context": "Need to show/hide a view conditionally in SwiftUI.",
+    "must_contain": ["if.*self|@State|opacity|conditional|if.*show"],
+    "must_not_suggest": [],
+    "source": "https://stackoverflow.com/questions/56490250",
+    "covered": false
+  }
+]

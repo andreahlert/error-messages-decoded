@@ -1,0 +1,142 @@
+[
+  {
+    "id": "node-openssl",
+    "error": "error:0308010C:digital envelope routines::unsupported",
+    "context": "npm run build fails with webpack 4 on Node 18.",
+    "must_contain": ["openssl-legacy-provider|NODE_OPTIONS|webpack@5"],
+    "must_not_suggest": ["downgrade node"]
+  },
+  {
+    "id": "k8s-crashloop",
+    "error": "CrashLoopBackOff",
+    "context": "Pod keeps restarting. kubectl describe shows Back-off restarting failed container.",
+    "must_contain": ["kubectl logs|--previous|describe pod|exit code"],
+    "must_not_suggest": ["delete the pod"]
+  },
+  {
+    "id": "python-pep668",
+    "error": "error: externally-managed-environment",
+    "context": "pip install requests fails on Ubuntu 24.04.",
+    "must_contain": ["venv|virtual.?env|pipx|python3 -m venv"],
+    "must_not_suggest": ["break-system-packages"]
+  },
+  {
+    "id": "k8s-oomkilled-jvm",
+    "error": "OOMKilled, Exit Code 137",
+    "context": "Java Spring Boot pod. Container limit 512Mi, -Xmx512m. Keeps getting OOMKilled after 2-3 hours.",
+    "must_contain": ["Xmx.*less|75%|MaxRAMPercentage|overhead|metaspace|heap.*smaller"],
+    "must_not_suggest": ["just increase.*limit|Xmx1g"]
+  },
+  {
+    "id": "docker-build-secret-layer",
+    "error": "ERROR: failed to solve: failed to compute cache key: /run/secrets/npmrc not found",
+    "context": "Docker build fails. I'm using RUN --mount=type=secret,id=npmrc in Dockerfile but building with plain docker build.",
+    "must_contain": ["DOCKER_BUILDKIT|buildkit|docker buildx|secret|--secret"],
+    "must_not_suggest": ["COPY .npmrc"]
+  },
+  {
+    "id": "postgres-idle-transaction",
+    "error": "ERROR: canceling statement due to lock timeout\nDETAIL: Process 1234 waits for AccessExclusiveLock on relation 16384",
+    "context": "ALTER TABLE ADD COLUMN hangs forever in production then times out. The table has only 1000 rows. No other migrations running.",
+    "must_contain": ["idle in transaction|pg_stat_activity|pg_locks|blocking|pg_terminate_backend|long.running"],
+    "must_not_suggest": ["increase lock_timeout|force"]
+  },
+  {
+    "id": "terraform-cycle",
+    "error": "Error: Cycle: aws_security_group.app, aws_security_group_rule.app_to_db, aws_security_group.db, aws_security_group_rule.db_from_app",
+    "context": "terraform plan fails with cycle error. SG app references SG db and SG db references SG app.",
+    "must_contain": ["inline|ingress|egress|security_group_rule|separate|self|aws_security_group_rule"],
+    "must_not_suggest": ["depends_on"]
+  },
+  {
+    "id": "node-memory-leak-event-listener",
+    "error": "MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 error listeners added to [Server]. Use emitter.setMaxListeners() to increase limit",
+    "context": "Node.js HTTP server. Warning appears after running for a few hours. Memory usage keeps growing.",
+    "must_contain": ["removeListener|removeAllListeners|once|off|cleanup|event listener.*leak"],
+    "must_not_suggest": ["setMaxListeners"]
+  },
+  {
+    "id": "nginx-ssl-handshake-sni",
+    "error": "SSL: error:14094410:SSL routines:ssl3_read_bytes:sslv3 alert handshake failure",
+    "context": "Nginx serves two domains with different SSL certs on the same IP. One domain works, the other gets handshake failure. Both certs are valid.",
+    "must_contain": ["server_name|default_server|SNI|ssl_certificate|server block|listen.*ssl"],
+    "must_not_suggest": ["renew certificate"]
+  },
+  {
+    "id": "python-asyncio-runtime-error",
+    "error": "RuntimeError: This event loop is already running",
+    "context": "Calling asyncio.run() inside a Jupyter notebook or inside a function that's already async.",
+    "must_contain": ["nest_asyncio|await|get_event_loop|already running|notebook|jupyter"],
+    "must_not_suggest": ["asyncio.run"]
+  },
+  {
+    "id": "git-reflog-force-push-recovery",
+    "error": "I force pushed to main and lost 3 commits from my coworker. git log shows they're gone.",
+    "context": "Someone did git push --force to main and overwrote commits. We need to recover the lost commits.",
+    "must_contain": ["reflog|git reflog|force.*push|cherry-pick|reset.*ORIG_HEAD|sha|remote.*reflog"],
+    "must_not_suggest": ["just commit again"]
+  },
+  {
+    "id": "docker-dns-resolve-build",
+    "error": "Could not resolve host: registry.npmjs.org",
+    "context": "Docker build fails at npm install with DNS resolution error. Host machine has internet. Other docker builds work.",
+    "must_contain": ["dns|resolv.conf|network|--network=host|daemon.json|8.8.8.8"],
+    "must_not_suggest": ["check your internet"]
+  },
+  {
+    "id": "k8s-pod-pending-taint",
+    "error": "0/3 nodes are available: 3 node(s) had untolerated taint {node.kubernetes.io/not-ready: }",
+    "context": "All pods stuck in Pending. Cluster has 3 nodes. kubectl get nodes shows all NotReady.",
+    "must_contain": ["kubelet|NotReady|systemctl|node.*status|describe node|container runtime|cni"],
+    "must_not_suggest": ["add tolerations|add more nodes"]
+  },
+  {
+    "id": "react-useeffect-infinite-loop",
+    "error": "Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect without a dependency array.",
+    "context": "My component keeps re-rendering infinitely. I have useEffect that calls setState.",
+    "must_contain": ["dependency array|\\[\\]|deps|missing dep|useEffect.*\\["],
+    "must_not_suggest": ["eslint-disable"]
+  },
+  {
+    "id": "mysql-too-many-connections-sleep",
+    "error": "ERROR 1040 (HY000): Too many connections",
+    "context": "MySQL on RDS. max_connections is 150. SHOW PROCESSLIST shows 148 connections in 'Sleep' state. The app only has 10 active users.",
+    "must_contain": ["connection pool|pool size|wait_timeout|idle|sleep|close|release|leak"],
+    "must_not_suggest": ["increase max_connections"]
+  },
+  {
+    "id": "github-actions-permission-denied",
+    "error": "remote: Permission to org/repo.git denied to github-actions[bot].\nfatal: unable to access 'https://github.com/org/repo.git/': The requested URL returned error: 403",
+    "context": "GitHub Actions workflow fails when trying to push to another repo in the same org. GITHUB_TOKEN is set.",
+    "must_contain": ["GITHUB_TOKEN.*scope|permissions|deploy key|PAT|personal access token|contents.*write|token.*repo"],
+    "must_not_suggest": ["checkout action"]
+  },
+  {
+    "id": "webpack-circular-dependency",
+    "error": "Circular dependency detected:\n  src/moduleA.js -> src/moduleB.js -> src/moduleA.js",
+    "context": "Webpack warns about circular dependency. Build succeeds but the app crashes at runtime with undefined imports.",
+    "must_contain": ["barrel|index|re-export|extract|third module|lazy|dynamic import|circular"],
+    "must_not_suggest": ["ignore the warning"]
+  },
+  {
+    "id": "python-pickle-version",
+    "error": "ValueError: unsupported pickle protocol: 5",
+    "context": "Loading a pickle file created on Python 3.8+ in a Python 3.6 environment.",
+    "must_contain": ["protocol|python version|pickle5|upgrade python|protocol=4|compatible"],
+    "must_not_suggest": ["just load it again"]
+  },
+  {
+    "id": "redis-latency-swap",
+    "error": "Latency spike: 99th percentile jumped from 1ms to 500ms",
+    "context": "Redis latency spikes periodically every few minutes. Memory usage is 80% of maxmemory. Server has swap enabled.",
+    "must_contain": ["swap|swappiness|vm.swappiness|disable swap|transparent huge pages|THP|bgsave|fork|latency"],
+    "must_not_suggest": ["increase maxmemory"]
+  },
+  {
+    "id": "grpc-deadline-exceeded-lb",
+    "error": "rpc error: code = DeadlineExceeded desc = context deadline exceeded",
+    "context": "gRPC calls fail intermittently with DeadlineExceeded. Direct calls to the server work fine. Using an L7 load balancer (ALB) in front.",
+    "must_contain": ["HTTP/2|h2c|gRPC.*ALB|NLB|connection.*reuse|keepalive|load balancer.*gRPC|target group"],
+    "must_not_suggest": ["increase timeout"]
+  }
+]

@@ -1,0 +1,39 @@
+{
+  "name": "@error-messages-decoded/mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server that decodes error messages. Feed it an error, get back the root cause, fix, and anti-patterns.",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "error-decoded-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "node scripts/build-index.js && tsc",
+    "dev": "node scripts/build-index.js && tsc && node dist/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "error-messages",
+    "debugging",
+    "developer-tools",
+    "ai-tools"
+  ],
+  "author": "andreahlert",
+  "license": "CC-BY-SA-4.0",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,382 @@
+{
+  "timestamp": "20260317-120923",
+  "cases": [
+    {
+      "id": "node-eacces",
+      "error": "npm ERR! Error: EACCES: permission denied, access '/usr/local/lib/node_modules'",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 4,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 3
+        }
+      }
+    },
+    {
+      "id": "node-heap-oom",
+      "error": "FATAL ERROR: CALL_AND_RETRY_LAST Allocation failed - JavaScript heap out of memory",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        }
+      }
+    },
+    {
+      "id": "node-openssl",
+      "error": "error:0308010C:digital envelope routines::unsupported",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 4
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 4,
+          "keyword_coverage": 4
+        }
+      }
+    },
+    {
+      "id": "docker-exec-format",
+      "error": "exec format error",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        }
+      }
+    },
+    {
+      "id": "k8s-crashloop",
+      "error": "CrashLoopBackOff",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 4,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        }
+      }
+    },
+    {
+      "id": "k8s-oomkilled",
+      "error": "OOMKilled",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 4
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        }
+      }
+    },
+    {
+      "id": "git-divergent",
+      "error": "hint: You have divergent branches and need to specify how to reconcile them.",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 4,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 4,
+          "keyword_coverage": 5
+        },
+        "treatment": {
+          "root_cause_accuracy": 4,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 4
+        }
+      }
+    },
+    {
+      "id": "git-publickey",
+      "error": "git@github.com: Permission denied (publickey). fatal: Could not read from remote repository.",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 4,
+          "anti_pattern_awareness": 4,
+          "keyword_coverage": 5
+        }
+      }
+    },
+    {
+      "id": "python-externally-managed",
+      "error": "error: externally-managed-environment",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 4,
+          "anti_pattern_awareness": 4,
+          "keyword_coverage": 5
+        }
+      }
+    },
+    {
+      "id": "react-hydration",
+      "error": "Hydration failed because the initial UI does not match what was rendered on the server.",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 4,
+          "keyword_coverage": 5
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        }
+      }
+    },
+    {
+      "id": "react-too-many-renders",
+      "error": "Too many re-renders. React limits the number of renders to prevent an infinite loop.",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        }
+      }
+    },
+    {
+      "id": "postgres-relation-not-exist",
+      "error": "ERROR: relation \"users\" does not exist",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 4,
+          "keyword_coverage": 5
+        }
+      }
+    },
+    {
+      "id": "postgres-too-many-connections",
+      "error": "FATAL: too many connections for role \"myapp\"",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 4,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 4
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 4
+        }
+      }
+    },
+    {
+      "id": "docker-no-space",
+      "error": "no space left on device",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 4
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 4
+        }
+      }
+    },
+    {
+      "id": "ts-type-not-assignable",
+      "error": "Type 'string | undefined' is not assignable to type 'string'. Type 'undefined' is not assignable to type 'string'.",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 3,
+          "keyword_coverage": 4
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        }
+      }
+    },
+    {
+      "id": "nginx-502",
+      "error": "502 Bad Gateway",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        },
+        "treatment": {
+          "root_cause_accuracy": 4,
+          "fix_quality": 4,
+          "anti_pattern_awareness": 4,
+          "keyword_coverage": 5
+        }
+      }
+    },
+    {
+      "id": "npm-eresolve",
+      "error": "npm ERR! ERESOLVE unable to resolve dependency tree",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 4
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 4,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        }
+      }
+    },
+    {
+      "id": "linux-too-many-open-files",
+      "error": "Too many open files",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 4
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 4,
+          "keyword_coverage": 4
+        }
+      }
+    },
+    {
+      "id": "aws-access-denied",
+      "error": "An error occurred (AccessDenied) when calling the PutObject operation: Access Denied",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 4,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 4,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        }
+      }
+    },
+    {
+      "id": "rust-borrow-moved",
+      "error": "borrow of moved value: `x`",
+      "scores": {
+        "baseline": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        },
+        "treatment": {
+          "root_cause_accuracy": 5,
+          "fix_quality": 5,
+          "anti_pattern_awareness": 5,
+          "keyword_coverage": 5
+        }
+      }
+    }
+  ],
+  "summary": {
+    "total_cases": 20,
+    "baseline": {
+      "avg_root_cause": 4.85,
+      "avg_fix_quality": 4.95,
+      "avg_anti_pattern": 4.8,
+      "avg_keyword_coverage": 4.65,
+      "avg_total": 4.8125
+    },
+    "treatment": {
+      "avg_root_cause": 4.9,
+      "avg_fix_quality": 4.7,
+      "avg_anti_pattern": 4.7,
+      "avg_keyword_coverage": 4.65,
+      "avg_total": 4.7375
+    }
+  }
+}
