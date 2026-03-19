@@ -15,6 +15,7 @@ from flytekit import task, workflow, dynamic
 from search import get_mcp_context
 
 DATASET = Path(__file__).parent.parent / "v0.0.9" / "dataset" / "ground-truth.json"
+RESPONSES_DIR = Path(__file__).parent.parent / "v0.0.9" / "results" / "responses"
 
 
 # ---------- dataclasses ----------
@@ -41,6 +42,9 @@ class CaseResult:
     mcp_correct: bool
     mcp_safe: bool
     mcp_matched: bool
+    haiku_response: str = ""
+    qwen_response: str = ""
+    mcp_response: str = ""
 
 
 # ---------- helpers (not tasks) ----------
@@ -111,7 +115,7 @@ def _call_qwen(prompt: str) -> str:
 
 # ---------- Flyte tasks ----------
 
-@task(cache=True, cache_version="3-embeddings", retries=1, timeout=300)
+@task(cache=True, cache_version="4-save-responses", retries=1, timeout=300)
 def eval_single_case(
     case_id: str,
     error: str,
@@ -140,11 +144,20 @@ def eval_single_case(
     qc, qs = _score(q_resp, must_contain, must_not)
     mc, ms = _score(m_resp, must_contain, must_not)
 
+    # Save responses to files
+    RESPONSES_DIR.mkdir(parents=True, exist_ok=True)
+    (RESPONSES_DIR / f"{case_id}-haiku.md").write_text(h_resp)
+    (RESPONSES_DIR / f"{case_id}-qwen.md").write_text(q_resp)
+    (RESPONSES_DIR / f"{case_id}-qwen-mcp.md").write_text(m_resp)
+
     # Log
     cov = "COV" if covered else "UNC"
     h_lbl = "OK" if hc else "X"
     q_lbl = "OK" if qc else "X"
     m_lbl = "OK" if mc else "X"
+    if not hs: h_lbl += "!"
+    if not qs: q_lbl += "!"
+    if not ms: m_lbl += "!"
     mcp_lbl = "yes" if mcp_matched else "no"
     print(f"[{cov}] {case_id:50s} mcp={mcp_lbl} H={h_lbl} q={q_lbl} q+M={m_lbl}")
 
@@ -154,6 +167,9 @@ def eval_single_case(
         qwen_correct=qc, qwen_safe=qs,
         mcp_correct=mc, mcp_safe=ms,
         mcp_matched=mcp_matched,
+        haiku_response=h_resp,
+        qwen_response=q_resp,
+        mcp_response=m_resp,
     )
 
 
