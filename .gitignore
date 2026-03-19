@@ -1,3 +1,5 @@
 node_modules/
 dist/
 *.output
+__pycache__/
+.embeddings-cache.pkl

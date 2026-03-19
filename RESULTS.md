@@ -154,7 +154,7 @@ MCP matched Haiku. When MCP had a match: 4/4 correct (100%). When no match: same
 
 ---
 
-## v0.0.7 - Harder SO errors (current)
+## v0.0.7 - Harder SO errors
 
 20 harder SO questions: ENOSPC/inotify trap, exec format error (two variants), Rust borrow checker, C segfaults, C++ linker errors, Go panic testing.
 
