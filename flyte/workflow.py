@@ -67,19 +67,29 @@ def _build_mcp_prompt(base_prompt: str, mcp_ctx: str) -> str:
 {base_prompt}"""
 
 
+def _any_branch(pattern: str, response: str) -> bool:
+    """Match `pattern` against `response`, case-insensitive.
+
+    `pattern` is an alternation built with "|" (e.g. "a|b|c"). If it is not a
+    valid regex, fall back to a literal substring test PER ALTERNATIVE, not on
+    the whole "a|b|c" string. The old fallback tested the joined string as one
+    substring, which never matched after a re.error and produced silent false
+    negatives in scoring.
+    """
+    try:
+        return bool(re.search(pattern, response, re.IGNORECASE))
+    except re.error:
+        low = response.lower()
+        return any(part.lower() in low for part in pattern.split("|") if part)
+
+
 def _score(response: str, must_contain: str, must_not: str) -> tuple[bool, bool]:
     correct = False
     safe = True
     if must_contain:
-        try:
-            correct = bool(re.search(must_contain, response, re.IGNORECASE))
-        except re.error:
-            correct = must_contain.lower() in response.lower()
+        correct = _any_branch(must_contain, response)
     if must_not:
-        try:
-            safe = not bool(re.search(must_not, response, re.IGNORECASE))
-        except re.error:
-            safe = must_not.lower() not in response.lower()
+        safe = not _any_branch(must_not, response)
     return correct, safe
 
 

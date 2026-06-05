@@ -3,3 +3,12 @@ dist/
 *.output
 __pycache__/
 .embeddings-cache.pkl
+
+# Agent artifacts (do not commit)
+.claude/
+.superpowers/
+CLAUDE.md
+**/settings.local.json
+**/scheduled_tasks.lock
+.apache-steward/
+docs/superpowers/
